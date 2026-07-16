@@ -99,11 +99,18 @@ Justo debajo del formulario del proyecto, está la sección para registrar a los
 10. Si te equivocaste al escribir el nombre de un alumno en la tabla, haz clic sobre esa fila y presiona el botón rojo **`Eliminar Seleccionado`**.
 11. Cuando ya hayas llenado todo, haz clic en el botón azul grande del fondo: **`💾 Registrar Proyecto en Base de Datos`**. Te saldrá un mensaje diciendo *"¡Registro Exitoso!"*.
 
-#### 🔍 Cómo buscar lo que ya registraste (Pestaña `Proyectos Registrados`):
+#### 🔍 Cómo buscar y exportar lo que ya registraste (Pestaña `Proyectos Registrados`):
 1. Haz clic en el menú izquierdo donde dice **`Proyectos Registrados`**.
 2. Verás una tabla grande con todas las tesis guardadas.
 3. Arriba verás una casilla que dice **`Buscar por código, título, modalidad o estado...`**.
 4. Simplemente empieza a escribir ahí dentro (por ejemplo escribe la palabra `Sistemas` o el apellido `Panaifo`). Verás que en tiempo real, mientras tecleas letra por letra, la tabla se filtra al instante mostrándote solo lo que coincide.
+5. **📥 Botones de Descarga y Exportación Inteligente:**
+   Justo debajo de la tabla de proyectos, tienes 5 botones específicos diseñados para que nunca confundas los datos del proyecto con las observaciones:
+   * **`Ver en Pantalla`**: Selecciona una fila de proyecto y presiona este botón para abrir una ventana rápida con sus correcciones metodológicas.
+   * **`Descargar Obs. (.TXT)`**: Descarga el historial de observaciones del proyecto seleccionado en un archivo de texto plano.
+   * **`Descargar Obs. Excel (.CSV)`**: **¡ESPECIAL PARA REVISIÓN!** Exporta estrictamente la tabla de observaciones (Evaluador, Fecha, Estado y Detalle de corrección) directamente a Excel en formato UTF-8 con tildes perfectamente visibles.
+   * **`Descargar Obs. PDF/HTML`**: Genera el documento oficial institucional de observaciones con escudo del IESTP Suiza para imprimir o guardar en PDF.
+   * **`Exportar Proyectos (.CSV)`**: Exporta la lista general de todos los proyectos registrados en la tabla central a Excel.
 
 ---
 
@@ -121,6 +128,10 @@ Al entrar con la cuenta `coordinador`, tú eres el evaluador metodológico. Tu m
    * **`RECHAZADO`**: Si el proyecto es plagio o no cumple en absoluto.
 5. **Si elegiste `OBSERVADO`:** Ve al cuadro de texto de abajo que dice *Descripción o motivo de la observación* y escribe claramente qué debe corregir el alumno (ejemplo: *`Falta incluir el diagrama de base de datos y la carta de aceptación de la empresa.`*).
 6. Haz clic en el botón azul **`⚡ Actualizar Estado / Guardar Observación`**. El estado cambiará en la base de datos inmediatamente.
+7. **📊 Descarga de Reportes y Observaciones desde Coordinación:**
+   En cualquiera de tus dos pestañas (**Revisión** o **Historial General de Observaciones**), cuentas con botones inferiores para obtener tus informes:
+   * **`Descargar Obs. Excel (.CSV)`**: Si estás en *Revisión* con un proyecto seleccionado, descarga en Excel las observaciones de esa tesis. Si estás en el *Historial General*, exporta a Excel **todas las observaciones** emitidas de todos los proyectos al instante.
+   * **`Descargar Obs. PDF/HTML`**: Crea un reporte formal para la mesa de evaluación en PDF o HTML con el sello de la Coordinación del IESTP Suiza.
 
 ---
 

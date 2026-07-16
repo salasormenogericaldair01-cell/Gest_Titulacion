@@ -152,6 +152,10 @@ public class ObservacionDAO {
         return lista;
     }
 
+    public List<Observacion> listarTodos() {
+        return listarTodas();
+    }
+
     private Observacion mapearObservacion(ResultSet rs) throws SQLException {
         return new Observacion(
             rs.getInt("id_observacion"),

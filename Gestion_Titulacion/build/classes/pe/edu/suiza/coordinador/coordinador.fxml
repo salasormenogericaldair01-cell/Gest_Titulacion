@@ -78,10 +78,12 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#descargarObservaciones" styleClass="btn-secondary" text="Descargar Observaciones" />
-                              <Button mnemonicParsing="false" onAction="#exportarProyectosExcel" styleClass="btn-secondary" text="Exportar Excel (.CSV)" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservaciones" styleClass="btn-secondary" text="Descargar Obs. (.TXT)" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservacionesExcel" styleClass="btn-primary" text="Descargar Obs. Excel (.CSV)" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservacionesPDF" styleClass="btn-primary" text="Descargar Obs. PDF/HTML" />
+                              <Button mnemonicParsing="false" onAction="#exportarProyectosExcel" styleClass="btn-secondary" text="Exportar Proyectos (.CSV)" />
                            </children>
                         </HBox>
                         
@@ -119,9 +121,11 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#descargarObservaciones" styleClass="btn-primary" text="Descargar Observaciones" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservaciones" styleClass="btn-secondary" text="Descargar Obs. (.TXT)" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservacionesExcel" styleClass="btn-primary" text="Descargar Obs. Excel (.CSV)" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservacionesPDF" styleClass="btn-primary" text="Descargar Obs. PDF/HTML" />
                            </children>
                         </HBox>
                      </children>
