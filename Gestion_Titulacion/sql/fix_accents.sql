@@ -1,0 +1,18 @@
+SET NAMES utf8mb4;
+UPDATE proyectos SET titulo = 'Sistema Inteligente de Gestión Hospitalaria y Control de Triage MediConnect en IESTP Suiza', programa_estudio = 'Desarrollo de Sistemas de Información', modalidad = 'Tesis o Proyecto de Aplicación Profesional' WHERE id_proyecto = 1;
+UPDATE proyectos SET titulo = 'Plataforma Web para el Control de Almacén e Inventarios con Código de Barras en Pucallpa', programa_estudio = 'Desarrollo de Sistemas de Información' WHERE id_proyecto = 2;
+UPDATE proyectos SET titulo = 'Evaluación de los Procesos Contables y Auditoría Digital en Mypes de la Región Ucayali', programa_estudio = 'Contabilidad' WHERE id_proyecto = 3;
+UPDATE proyectos SET titulo = 'Sistema Móvil para el Segregado de Residuos Hospitalarios y Protocolos de Bioseguridad', programa_estudio = 'Enfermería Técnica' WHERE id_proyecto = 4;
+UPDATE catalogos SET nombre_item = 'Desarrollo de Sistemas de Información' WHERE id_catalogo = 1;
+UPDATE catalogos SET nombre_item = 'Enfermería Técnica' WHERE id_catalogo = 3;
+UPDATE catalogos SET nombre_item = 'Administración de Empresas' WHERE id_catalogo = 4;
+UPDATE catalogos SET nombre_item = 'Tesis o Proyecto de Aplicación Profesional' WHERE id_catalogo = 5;
+UPDATE catalogos SET nombre_item = 'Dra. María Gonzales' WHERE id_catalogo = 10;
+UPDATE catalogos SET nombre_item = 'Ing. Fernando Gómez López' WHERE id_catalogo = 11;
+UPDATE usuarios SET nombre_completo = 'Noelia Bolaños (Atención y Registro)' WHERE id_usuario = 1;
+UPDATE usuarios SET nombre_completo = 'Mg. Ruber Torres Arevalo (Coordinación)' WHERE id_usuario = 2;
+UPDATE usuarios SET nombre_completo = 'Dr. Alejandro Barbaran (Jefatura Investigación)' WHERE id_usuario = 3;
+UPDATE usuarios SET nombre_completo = 'Isak Rioja (Soporte Titulación)' WHERE id_usuario = 4;
+UPDATE estudiantes SET apellidos = 'Bolaños' WHERE id_estudiante = 3;
+UPDATE estudiantes SET apellidos = 'Salas Morán' WHERE id_estudiante = 4;
+UPDATE estudiantes SET nombres = 'María', apellidos = 'López García' WHERE id_estudiante = 5;

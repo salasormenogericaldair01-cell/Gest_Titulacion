@@ -1,0 +1,108 @@
+/* ==============================================================================
+   ESTILO INSTITUCIONAL - IESTP SUIZA (MÓDULO DE RECUPERACIÓN / TICKET TI)
+   ============================================================================== */
+
+@font-face {
+    font-family: 'Font Awesome 6 Free Solid';
+    src: url('fa-solid-900.ttf');
+}
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    src: url('fa-solid-900.ttf');
+}
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('fa-solid-900.ttf');
+}
+
+.root {
+    -fx-background-color: radial-gradient(center 50% 50%, radius 80%, #f0f4f8 0%, #d9e2ec 100%);
+    -fx-font-family: "Segoe UI", "Tahoma", "Verdana", sans-serif;
+}
+.button, .label, .text-field {
+    -fx-font-family: "Segoe UI", "Tahoma", "Verdana", sans-serif;
+}
+
+.card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1px;
+    -fx-padding: 30px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 8);
+}
+
+.title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e3a8a;
+}
+
+.subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+    -fx-wrap-text: true;
+}
+
+.field-label {
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+.input-box {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1px;
+    -fx-padding: 0 10px;
+    -fx-min-height: 42px;
+    -fx-alignment: center-left;
+}
+
+.input-box:focused-within {
+    -fx-border-color: #2563eb;
+    -fx-border-width: 1.5px;
+}
+
+.text-field-custom {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e293b;
+}
+
+.btn-primary {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-padding: 10px 18px;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.btn-secondary {
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #334155;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-padding: 10px 18px;
+}
+
+.ticket-box {
+    -fx-background-color: #ecfdf5;
+    -fx-border-color: #10b981;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 15px;
+    -fx-alignment: center;
+}

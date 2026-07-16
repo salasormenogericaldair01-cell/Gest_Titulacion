@@ -1,0 +1,130 @@
+package pe.edu.suiza.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import pe.edu.suiza.modelo.Usuario;
+
+/**
+ * DAO para gestión de usuarios en XAMPP MySQL.
+ * Paquete: pe.edu.suiza.dao
+ */
+public class UsuarioDAO {
+    
+    public Usuario validarLogin(String username, String password) {
+        String sql = "SELECT * FROM usuarios WHERE username = ? AND password_claro = ? AND estado = 'ACTIVO'";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return null;
+            
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return new Usuario(
+                    rs.getInt("id_usuario"),
+                    rs.getString("username"),
+                    rs.getString("password_claro"),
+                    rs.getString("rol"),
+                    rs.getString("nombre_completo"),
+                    rs.getString("estado"),
+                    rs.getTimestamp("fecha_registro")
+                );
+            }
+        } catch (SQLException e) {
+            System.err.println("[UsuarioDAO] Error en validarLogin: " + e.getMessage());
+        } finally {
+            cerrarRecursos(pstmt, rs);
+        }
+        return null;
+    }
+    
+    public String generarTicketRecuperacion(String username) {
+        String sqlVerificar = "SELECT id_usuario FROM usuarios WHERE username = ? AND estado = 'ACTIVO'";
+        String sqlTicket = "INSERT INTO observaciones (id_proyecto, id_usuario, rol_autor, descripcion, estado_observacion) VALUES (NULL, ?, 'TICKET_TI', ?, 'PENDIENTE')";
+        Connection conn = null;
+        PreparedStatement pstmtVer = null;
+        PreparedStatement pstmtIns = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return null;
+            
+            pstmtVer = conn.prepareStatement(sqlVerificar);
+            pstmtVer.setString(1, username);
+            rs = pstmtVer.executeQuery();
+            
+            if (rs.next()) {
+                int idUsuario = rs.getInt("id_usuario");
+                int numRandom = (int)(Math.random() * 9000) + 1000;
+                String ticket = "TICK-SUIZA-" + numRandom;
+                String descripcion = "SOLICITUD RESETEO CLAVE LOCAL - TICKET TI: " + ticket;
+                
+                pstmtIns = conn.prepareStatement(sqlTicket);
+                pstmtIns.setInt(1, idUsuario);
+                pstmtIns.setString(2, descripcion);
+                if (pstmtIns.executeUpdate() > 0) {
+                    return ticket;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("[UsuarioDAO] Error en generarTicketRecuperacion: " + e.getMessage());
+        } finally {
+            cerrarRecursos(pstmtVer, rs);
+            cerrarRecursos(pstmtIns, null);
+        }
+        return null;
+    }
+    
+    public List<Usuario> listarTodos() {
+        List<Usuario> lista = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios ORDER BY id_usuario DESC";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return lista;
+            
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                lista.add(new Usuario(
+                    rs.getInt("id_usuario"),
+                    rs.getString("username"),
+                    rs.getString("password_claro"),
+                    rs.getString("rol"),
+                    rs.getString("nombre_completo"),
+                    rs.getString("estado"),
+                    rs.getTimestamp("fecha_registro")
+                ));
+            }
+        } catch (SQLException e) {
+            System.err.println("[UsuarioDAO] Error en listarTodos: " + e.getMessage());
+        } finally {
+            cerrarRecursos(pstmt, rs);
+        }
+        return lista;
+    }
+    
+    private void cerrarRecursos(PreparedStatement pstmt, ResultSet rs) {
+        try {
+            if (rs != null) rs.close();
+            if (pstmt != null) pstmt.close();
+        } catch (SQLException e) {
+            System.err.println("[UsuarioDAO] Error al cerrar recursos: " + e.getMessage());
+        }
+    }
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="Gestion_Titulacion.jnlp">
+  <information>
+    <title>Gestion_Titulacion</title>
+    <vendor>Geric</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="Gestion_Titulacion.jar" size="1329597" download="eager" />
+    <jar href="lib\atlantafx-base-2.0.1.jar" size="710348" download="eager" />
+    <jar href="lib\mysql-connector-j-8.4.0.jar" size="2533399" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="Gestion_Titulacion" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="pe.edu.suiza.login.LoginApp"  name="Gestion_Titulacion" />
+  <update check="always"/>
+</jnlp>

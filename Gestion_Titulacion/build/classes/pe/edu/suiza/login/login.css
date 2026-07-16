@@ -1,0 +1,186 @@
+/* ==============================================================================
+   ESTILO INSTITUCIONAL - IESTP SUIZA (MÓDULO DE LOGIN)
+   MIGRACIÓN FIEL 1:1 DE LA REFERENCIA HTML/WEB (code.html / TailwindCSS)
+   ============================================================================== */
+
+@font-face {
+    font-family: 'Font Awesome 6 Free Solid';
+    src: url('fa-solid-900.ttf');
+}
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    src: url('fa-solid-900.ttf');
+}
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('fa-solid-900.ttf');
+}
+
+/* Fondo con Gradiente Radial idéntico a Tailwind .bg-login-gradient */
+.root {
+    -fx-background-color: radial-gradient(center 50% 50%, radius 75%, #f0f4f8 0%, #d9e2ec 100%);
+    -fx-font-family: "Segoe UI", "Tahoma", "Verdana", sans-serif;
+}
+.button, .label, .text-field {
+    -fx-font-family: "Segoe UI", "Tahoma", "Verdana", sans-serif;
+}
+
+/* Contenedor Principal (LoginCard: max-w-md, p-8 md:p-10, rounded-16px, shadow-custom) */
+.login-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 25, 0, 0, 10);
+    -fx-padding: 38px 42px;
+}
+
+/* Contenedor del Logotipo / Icono Superior (w-24 h-24 rounded-full border-2 border-slate-200) */
+.logo-circle {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 50%;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 50%;
+    -fx-border-width: 2px;
+    -fx-min-width: 96px;
+    -fx-min-height: 96px;
+    -fx-max-width: 96px;
+    -fx-max-height: 96px;
+    -fx-alignment: center;
+    -fx-padding: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(15, 23, 42, 0.06), 8, 0, 0, 2);
+}
+
+.logo-circle-text {
+    -fx-font-family: "Font Awesome 6 Free Solid", "Segoe UI Symbol";
+    -fx-font-size: 44px;
+    -fx-text-fill: #334155;
+}
+
+/* Títulos y Subtítulos (text-[#1e3a8a] text-2xl font-bold leading-tight) */
+.login-title {
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e3a8a;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+}
+
+.login-subtitle {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748b;
+    -fx-text-alignment: center;
+}
+
+/* Línea divisoria <hr class="border-t border-slate-100 mb-8"/> */
+.separator-line {
+    -fx-background-color: #f1f5f9;
+    -fx-max-height: 1px;
+    -fx-pref-height: 1px;
+}
+
+/* Etiquetas de Campos (block text-sm font-semibold text-slate-700) */
+.field-label {
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+/* Contenedor de Input (border border-slate-300 rounded-lg py-3) */
+.input-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 1px;
+    -fx-alignment: center-left;
+    -fx-padding: 0 12px;
+    -fx-min-height: 46px;
+}
+
+.input-container:focused-within {
+    -fx-border-color: #2563eb;
+    -fx-border-width: 1.5px;
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.18), 8, 0, 0, 0);
+}
+
+.input-icon {
+    -fx-font-family: "Font Awesome 6 Free Solid", "Segoe UI Symbol";
+    -fx-font-size: 16px;
+    -fx-text-fill: #64748b;
+    -fx-min-width: 26px;
+    -fx-alignment: center;
+}
+
+.text-field-custom, .password-field-custom {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #1e293b;
+    -fx-font-size: 14.5px;
+    -fx-prompt-text-fill: #94a3b8;
+    -fx-padding: 8px 6px;
+}
+
+.text-field-custom:focused, .password-field-custom:focused {
+    -fx-background-color: transparent;
+}
+
+/* Botón Principal Ingresar */
+.btn-primary {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15.5px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+    -fx-padding: 12px 20px;
+    -fx-alignment: center;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #1d4ed8;
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.28), 10, 0, 0, 3);
+}
+
+/* Botón Secundario Salir */
+.btn-secondary {
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #334155;
+    -fx-font-size: 15.5px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+    -fx-padding: 12px 20px;
+    -fx-alignment: center;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #cbd5e1;
+    -fx-text-fill: #0f172a;
+}
+
+/* Enlaces inferior (Recuperar y Cambiar Contraseña) */
+.link-custom {
+    -fx-text-fill: #2563eb;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-underline: false;
+    -fx-cursor: hand;
+}
+
+.link-custom:hover {
+    -fx-text-fill: #1d4ed8;
+    -fx-underline: true;
+}
+
+.error-label {
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
