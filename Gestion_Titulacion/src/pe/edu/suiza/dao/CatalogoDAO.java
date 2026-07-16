@@ -123,13 +123,21 @@ public class CatalogoDAO {
 
     private List<Catalogo> obtenerCatalogosOfflineRespaldo() {
         List<Catalogo> rescate = new ArrayList<>();
-        rescate.add(new Catalogo(1, "PROGRAMA_ESTUDIO", "DSI", "Desarrollo de Sistemas de Información", "Carrera Técnica 3 años", "ACTIVO"));
-        rescate.add(new Catalogo(2, "PROGRAMA_ESTUDIO", "ENF", "Enfermería Técnica", "Carrera Técnica 3 años", "ACTIVO"));
-        rescate.add(new Catalogo(3, "PROGRAMA_ESTUDIO", "CONT", "Contabilidad", "Carrera Técnica 3 años", "ACTIVO"));
-        rescate.add(new Catalogo(4, "MODALIDAD_TITULACION", "TESIS", "Tesis o Proyecto de Aplicación Profesional", "Modalidad principal de titulación", "ACTIVO"));
-        rescate.add(new Catalogo(5, "MODALIDAD_TITULACION", "SUF", "Examen de Suficiencia Profesional", "Modalidad evaluación teórica/práctica", "ACTIVO"));
-        rescate.add(new Catalogo(6, "ASESOR", "ASE-1", "Ing. Ruber Torres Arevalo", "Docente Principal de Titulación", "ACTIVO"));
-        rescate.add(new Catalogo(7, "ASESOR", "ASE-2", "Lic. Carlos Mendoza", "Docente Asesor Metodológico", "ACTIVO"));
+        rescate.add(new Catalogo(1, "PROGRAMA_ESTUDIO", "AOT", "ADMINISTRACION DE OPERACIONES TURÍSTICAS", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(2, "PROGRAMA_ESTUDIO", "AA", "ASISTENCIA ADMINISTRATIVA", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(3, "PROGRAMA_ESTUDIO", "CONT", "CONTABILIDAD", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(4, "PROGRAMA_ESTUDIO", "CC", "CONSTRUCCIÓN CIVIL", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(5, "PROGRAMA_ESTUDIO", "GA", "GESTIÓN ADMINISTRATIVA", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(6, "PROGRAMA_ESTUDIO", "DSI", "DESARROLLO DE SISTEMAS DE INFORMACIÓN", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(7, "PROGRAMA_ESTUDIO", "EI", "ELECTRICIDAD INDUSTRIAL", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(8, "PROGRAMA_ESTUDIO", "ENF", "ENFERMERÍA TÉCNICA", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(9, "PROGRAMA_ESTUDIO", "MF", "MANEJO FORESTAL", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(10, "PROGRAMA_ESTUDIO", "MA", "MECATRÓNICA AUTOMOTRIZ", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(11, "PROGRAMA_ESTUDIO", "PA", "PRODUCCIÓN AGROPECUARIA", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(12, "MODALIDAD_TITULACION", "TESIS", "Tesis o Proyecto de Aplicación Profesional", "Modalidad principal de titulación", "ACTIVO"));
+        rescate.add(new Catalogo(13, "MODALIDAD_TITULACION", "SUF", "Examen de Suficiencia Profesional", "Modalidad evaluación teórica/práctica", "ACTIVO"));
+        rescate.add(new Catalogo(14, "ASESOR", "ASE-1", "Ing. Ruber Torres Arevalo", "Docente Principal de Titulación", "ACTIVO"));
+        rescate.add(new Catalogo(15, "ASESOR", "ASE-2", "Lic. Carlos Mendoza", "Docente Asesor Metodológico", "ACTIVO"));
         return rescate;
     }
 

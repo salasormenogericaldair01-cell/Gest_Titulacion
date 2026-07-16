@@ -122,10 +122,17 @@ INSERT INTO usuarios (username, password, password_claro, nombre_completo, rol, 
 -- 2. Insertar Catálogos del Sistema
 -- Programas de Estudio
 INSERT INTO catalogos (tipo_catalogo, nombre_item, codigo_item, descripcion, estado) VALUES
-('PROGRAMA_ESTUDIO', 'Desarrollo de Sistemas de Información', 'DSI-2026', 'Carrera Tecnológica de 3 años orientada a software y bases de datos.', 'ACTIVO'),
-('PROGRAMA_ESTUDIO', 'Contabilidad', 'CONT-2026', 'Carrera orientada a sistemas financieros y auditoría contable.', 'ACTIVO'),
-('PROGRAMA_ESTUDIO', 'Enfermería Técnica', 'ENF-2026', 'Carrera de salud y asistencia clínica asistencial.', 'ACTIVO'),
-('PROGRAMA_ESTUDIO', 'Administración de Empresas', 'ADM-2026', 'Gestión empresarial y finanzas organizacionales.', 'ACTIVO');
+('PROGRAMA_ESTUDIO', 'ADMINISTRACION DE OPERACIONES TURÍSTICAS', 'AOT', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'ASISTENCIA ADMINISTRATIVA', 'AA', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'CONTABILIDAD', 'CONT', 'Carrera orientada a sistemas financieros y auditoría contable.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'CONSTRUCCIÓN CIVIL', 'CC', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'GESTIÓN ADMINISTRATIVA', 'GA', 'Gestión empresarial y finanzas organizacionales.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'DESARROLLO DE SISTEMAS DE INFORMACIÓN', 'DSI', 'Carrera Tecnológica de 3 años orientada a software y bases de datos.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'ELECTRICIDAD INDUSTRIAL', 'EI', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'ENFERMERÍA TÉCNICA', 'ENF', 'Carrera de salud y asistencia clínica asistencial.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'MANEJO FORESTAL', 'MF', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'MECATRÓNICA AUTOMOTRIZ', 'MA', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+('PROGRAMA_ESTUDIO', 'PRODUCCIÓN AGROPECUARIA', 'PA', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO');
 
 -- Modalidades de Titulación
 INSERT INTO catalogos (tipo_catalogo, nombre_item, codigo_item, descripcion, estado) VALUES
@@ -150,10 +157,10 @@ INSERT INTO catalogos (tipo_catalogo, nombre_item, codigo_item, descripcion, est
 
 -- 3. Insertar Proyectos de Ejemplo (Con fechas variadas para probar los filtros de 1 mes a 5 años)
 INSERT INTO proyectos (codigo_proyecto, titulo, programa_estudio, modalidad, asesor, estado, fecha_registro, resumen, id_usuario_registro) VALUES
-('PROY-SUIZA-2026-001', 'Sistema Inteligente de Gestión Hospitalaria y Control de Triage MediConnect en IESTP Suiza', 'Desarrollo de Sistemas de Información', 'Tesis o Proyecto de Aplicación Profesional', 'Ing. Ruber Torres Arevalo', 'EN_REVISION', CURDATE() - INTERVAL 15 DAY, 'Desarrollo de un sistema de control hospitalario con arquitectura All-in-One y JavaFX.', 1),
-('PROY-SUIZA-2026-042', 'Plataforma Web para el Control de Almacén e Inventarios con Código de Barras en Pucallpa', 'Desarrollo de Sistemas de Información', 'Examen de Suficiencia Profesional', 'Lic. Carlos Mendoza', 'APROBADO_COORDINACION', CURDATE() - INTERVAL 3 MONTH, 'Implementación de sistema web para reducir pérdidas en el almacén central de la institución.', 1),
-('PROY-SUIZA-2025-018', 'Evaluación de los Procesos Contables y Auditoría Digital en Mypes de la Región Ucayali', 'Contabilidad', 'Tesis o Proyecto de Aplicación Profesional', 'Dra. María Gonzales', 'OBSERVADO', CURDATE() - INTERVAL 14 MONTH, 'Investigación de impacto tributario y digitalización contable en empresas locales.', 1),
-('PROY-SUIZA-2023-005', 'Sistema Móvil para el Segregado de Residuos Hospitalarios y Protocolos de Bioseguridad', 'Enfermería Técnica', 'Examen de Suficiencia Profesional', 'Ing. Ruber Torres Arevalo', 'APROBADO_FINAL', CURDATE() - INTERVAL 4 YEAR, 'App móvil para control de protocolos de bioseguridad en centros de salud.', 1);
+('PROY-SUIZA-2026-001', 'Sistema Inteligente de Gestión Hospitalaria y Control de Triage MediConnect en IESTP Suiza', 'DESARROLLO DE SISTEMAS DE INFORMACIÓN', 'Tesis o Proyecto de Aplicación Profesional', 'Ing. Ruber Torres Arevalo', 'EN_REVISION', CURDATE() - INTERVAL 15 DAY, 'Desarrollo de un sistema de control hospitalario con arquitectura All-in-One y JavaFX.', 1),
+('PROY-SUIZA-2026-042', 'Plataforma Web para el Control de Almacén e Inventarios con Código de Barras en Pucallpa', 'DESARROLLO DE SISTEMAS DE INFORMACIÓN', 'Examen de Suficiencia Profesional', 'Lic. Carlos Mendoza', 'APROBADO_COORDINACION', CURDATE() - INTERVAL 3 MONTH, 'Implementación de sistema web para reducir pérdidas en el almacén central de la institución.', 1),
+('PROY-SUIZA-2025-018', 'Evaluación de los Procesos Contables y Auditoría Digital en Mypes de la Región Ucayali', 'CONTABILIDAD', 'Tesis o Proyecto de Aplicación Profesional', 'Dra. María Gonzales', 'OBSERVADO', CURDATE() - INTERVAL 14 MONTH, 'Investigación de impacto tributario y digitalización contable en empresas locales.', 1),
+('PROY-SUIZA-2023-005', 'Sistema Móvil para el Segregado de Residuos Hospitalarios y Protocolos de Bioseguridad', 'ENFERMERÍA TÉCNICA', 'Examen de Suficiencia Profesional', 'Ing. Ruber Torres Arevalo', 'APROBADO_FINAL', CURDATE() - INTERVAL 4 YEAR, 'App móvil para control de protocolos de bioseguridad en centros de salud.', 1);
 
 -- 4. Insertar Estudiantes (Integrantes asignados a proyectos)
 INSERT INTO estudiantes (id_proyecto, dni_codigo, nombres, apellidos, email, telefono, codigo_estudiante) VALUES

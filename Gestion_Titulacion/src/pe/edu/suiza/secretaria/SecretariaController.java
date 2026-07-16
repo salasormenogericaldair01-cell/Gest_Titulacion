@@ -171,7 +171,19 @@ public class SecretariaController implements Initializable {
         if (!carreras.isEmpty()) {
             for (Catalogo c : carreras) cbPrograma.getItems().add(c.getNombreItem());
         } else {
-            cbPrograma.getItems().addAll("Desarrollo de Sistemas de Información", "Enfermería Técnica", "Contabilidad");
+            cbPrograma.getItems().addAll(
+                "ADMINISTRACION DE OPERACIONES TURÍSTICAS",
+                "ASISTENCIA ADMINISTRATIVA",
+                "CONTABILIDAD",
+                "CONSTRUCCIÓN CIVIL",
+                "GESTIÓN ADMINISTRATIVA",
+                "DESARROLLO DE SISTEMAS DE INFORMACIÓN",
+                "ELECTRICIDAD INDUSTRIAL",
+                "ENFERMERÍA TÉCNICA",
+                "MANEJO FORESTAL",
+                "MECATRÓNICA AUTOMOTRIZ",
+                "PRODUCCIÓN AGROPECUARIA"
+            );
         }
 
         List<Catalogo> modalidades = catalogoDAO.listarPorTipo("MODALIDAD_TITULACION");
