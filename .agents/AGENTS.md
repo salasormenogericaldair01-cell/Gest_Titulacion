@@ -1,6 +1,6 @@
 # CEREBRO CENTRAL DE AGENTES (SECOND BRAIN - AGENTS.MD)
 ## PROYECTO: SISTEMA DE REGISTRO DE PROYECTOS DE TITULACIÓN - IESTP SUIZA
-**Ubicación del Workspace:** `C:\Users\Geric\Desktop\Gestion de Titulacion`  
+**Ubicación del Workspace:** `C:\Users\Geric\Desktop\Gest_Titulacion`  
 **Estado:** Activo y Sincronizado | **Última actualización:** Julio 2026
 
 ---
