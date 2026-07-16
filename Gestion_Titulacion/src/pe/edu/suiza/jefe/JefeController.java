@@ -46,6 +46,7 @@ import pe.edu.suiza.modelo.Catalogo;
 import pe.edu.suiza.modelo.Observacion;
 import pe.edu.suiza.modelo.Proyecto;
 import pe.edu.suiza.modelo.Usuario;
+import pe.edu.suiza.utilidades.ExportadorInstitucional;
 import pe.edu.suiza.utilidades.SesionActual;
 
 /**
@@ -391,109 +392,101 @@ public class JefeController implements Initializable {
             mostrarAlerta("Tabla vacía", "No hay registros en la tabla para exportar a Excel. Aplique un filtro primero.");
             return;
         }
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Guardar Reporte en Excel (CSV Compatible)");
-        fileChooser.setInitialFileName("Reporte_Proyectos_Titulacion_Suiza.csv");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo CSV Compatible Excel (*.csv)", "*.csv"));
         Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
-        File archivo = fileChooser.showSaveDialog(stage);
-        if (archivo != null) {
-            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
-                pw.write('\ufeff'); // BOM UTF-8 para abrir con acentos exactos en Excel
-                pw.println("FECHA REGISTRO;CÓDIGO PROYECTO;TÍTULO DEL PROYECTO;PROGRAMA DE ESTUDIO;MODALIDAD;ASESOR;ESTADO ACTUAL");
-                for (Proyecto p : tbReportes.getItems()) {
-                    pw.println(String.format("%s;%s;\"%s\";\"%s\";\"%s\";\"%s\";%s",
-                        p.getFechaRegistro() != null ? p.getFechaRegistro().toString() : "N/A",
-                        p.getCodigoProyecto(),
-                        p.getTitulo() != null ? p.getTitulo().replace("\"", "\"\"") : "",
-                        p.getProgramaEstudio() != null ? p.getProgramaEstudio().replace("\"", "\"\"") : "",
-                        p.getModalidad() != null ? p.getModalidad().replace("\"", "\"\"") : "",
-                        p.getAsesor() != null ? p.getAsesor().replace("\"", "\"\"") : "",
-                        p.getEstado()
-                    ));
-                }
-                pw.flush();
-                mostrarAlerta("Exportación Exitosa", "El reporte se guardó correctamente en:\n" + archivo.getAbsolutePath());
-                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
-            } catch (Exception e) {
-                mostrarAlerta("Error al Exportar", "Ocurrió un error al escribir el archivo: " + e.getMessage());
-            }
+        String[] cabeceras = {"FECHA REGISTRO", "CÓDIGO PROYECTO", "TÍTULO DEL PROYECTO", "PROGRAMA DE ESTUDIO", "MODALIDAD", "ASESOR", "ESTADO ACTUAL"};
+        List<String[]> filas = new ArrayList<>();
+        for (Proyecto p : tbReportes.getItems()) {
+            filas.add(new String[]{
+                p.getFechaRegistro() != null ? p.getFechaRegistro().toString() : "-",
+                p.getCodigoProyecto(),
+                p.getTitulo() != null ? p.getTitulo() : "",
+                p.getProgramaEstudio() != null ? p.getProgramaEstudio() : "",
+                p.getModalidad() != null ? p.getModalidad() : "",
+                p.getAsesor() != null ? p.getAsesor() : "",
+                p.getEstado()
+            });
         }
+        ExportadorInstitucional.exportarTablaExcelInstitucional(stage, "REPORTE OFICIAL Y CONSOLIDADO DE PROYECTOS", "MÓDULO DE JEFATURA DE INVESTIGACIÓN", cabeceras, filas, "Reporte_Oficial_Jefatura_Suiza");
     }
 
     @FXML
     private void descargarReportePDF(ActionEvent event) {
         if (tbReportes == null || tbReportes.getItems().isEmpty()) {
-            mostrarAlerta("Tabla vacía", "No hay registros en la tabla para generar el documento oficial.");
+            mostrarAlerta("Tabla vacía", "No hay registros en la tabla para generar el documento oficial en PDF/HTML.");
             return;
         }
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Guardar Documento de Reporte Oficial (HTML/Imprimible)");
-        fileChooser.setInitialFileName("Reporte_Oficial_IESTP_Suiza.html");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Documento Oficial HTML (*.html)", "*.html"));
         Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
-        File archivo = fileChooser.showSaveDialog(stage);
-        if (archivo != null) {
-            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
-                pw.println("<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><title>Reporte Oficial IESTP Suiza</title>");
-                pw.println("<style>body{font-family:'Segoe UI',sans-serif;margin:40px;color:#1e293b;} h1{color:#1e3a8a;border-bottom:3px solid #dc2626;padding-bottom:10px;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #cbd5e1;padding:10px;text-align:left;} th{background-color:#1e3a8a;color:white;} tr:nth-child(even){background-color:#f8fafc;} .meta{background:#eff6ff;padding:15px;border-radius:8px;margin-bottom:20px;}</style></head><body>");
-                pw.println("<h1>INSTITUTO DE EDUCACIÓN SUPERIOR TECNOLÓGICO PÚBLICO SUIZA</h1>");
-                pw.println("<h2>REPORTE OFICIAL DE PROYECTOS DE TITULACIÓN</h2>");
-                pw.println("<div class='meta'><b>Fecha de Emisión:</b> " + LocalDate.now() + " | <b>Total Proyectos:</b> " + tbReportes.getItems().size() + "</div>");
-                pw.println("<table><thead><tr><th>Fecha</th><th>Código</th><th>Título del Proyecto</th><th>Programa de Estudio</th><th>Modalidad</th><th>Asesor</th><th>Estado</th></tr></thead><tbody>");
-                for (Proyecto p : tbReportes.getItems()) {
-                    pw.println("<tr><td>" + (p.getFechaRegistro()!=null?p.getFechaRegistro():"-") + "</td><td><b>" + p.getCodigoProyecto() + "</b></td><td>" + p.getTitulo() + "</td><td>" + p.getProgramaEstudio() + "</td><td>" + p.getModalidad() + "</td><td>" + p.getAsesor() + "</td><td><b>" + p.getEstado() + "</b></td></tr>");
-                }
-                pw.println("</tbody></table></body></html>");
-                pw.flush();
-                mostrarAlerta("Reporte Oficial Generado", "El documento oficial para imprimir o guardar en PDF se creó en:\n" + archivo.getAbsolutePath());
-                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
-            } catch (Exception e) {
-                mostrarAlerta("Error al Generar Documento", "Ocurrió un error al crear el reporte oficial: " + e.getMessage());
-            }
+        String[] cabeceras = {"FECHA REGISTRO", "CÓDIGO PROYECTO", "TÍTULO DEL PROYECTO", "PROGRAMA DE ESTUDIO", "MODALIDAD", "ASESOR", "ESTADO ACTUAL"};
+        List<String[]> filas = new ArrayList<>();
+        for (Proyecto p : tbReportes.getItems()) {
+            filas.add(new String[]{
+                p.getFechaRegistro() != null ? p.getFechaRegistro().toString() : "-",
+                p.getCodigoProyecto(),
+                p.getTitulo() != null ? p.getTitulo() : "",
+                p.getProgramaEstudio() != null ? p.getProgramaEstudio() : "",
+                p.getModalidad() != null ? p.getModalidad() : "",
+                p.getAsesor() != null ? p.getAsesor() : "",
+                p.getEstado()
+            });
         }
+        ExportadorInstitucional.exportarDocumentoPdfHtmlInstitucional(stage, "REPORTE INSTITUCIONAL DE PROYECTOS DE TITULACIÓN", "CONSOLIDADO OFICIAL - FILTRO TEMPORAL", "JEFATURA DE INVESTIGACIÓN Y DIRECCIÓN", cabeceras, filas, "Reporte_Oficial_Jefatura_Suiza");
     }
 
     @FXML
     private void descargarObservaciones(ActionEvent event) {
-        Proyecto sel = tbProyectosAprobacion.getSelectionModel().getSelectedItem();
+        descargarObservacionesExcel(event);
+    }
+
+    @FXML
+    private void descargarObservacionesExcel(ActionEvent event) {
+        Proyecto sel = tbProyectosAprobacion != null ? tbProyectosAprobacion.getSelectionModel().getSelectedItem() : null;
         if (sel == null) {
-            mostrarAlerta("Selección requerida", "Seleccione un proyecto para descargar su historial de observaciones.");
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto para descargar su historial de observaciones en Excel.");
             return;
         }
         List<Observacion> observaciones = observacionDAO.listarPorCodigoProyecto(sel.getCodigoProyecto());
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Descargar Observaciones Metodológicas");
-        fileChooser.setInitialFileName("Observaciones_" + sel.getCodigoProyecto() + ".txt");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo de Texto (*.txt)", "*.txt"));
         Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
-        File archivo = fileChooser.showSaveDialog(stage);
-        if (archivo != null) {
-            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
-                pw.println("======================================================================");
-                pw.println("IESTP SUIZA - HISTORIAL DE OBSERVACIONES Y EVALUACIÓN DE TITULACIÓN");
-                pw.println("======================================================================");
-                pw.println("Proyecto: " + sel.getCodigoProyecto());
-                pw.println("Título:   " + sel.getTitulo());
-                pw.println("Carrera:  " + sel.getProgramaEstudio());
-                pw.println("Estado Actual: " + sel.getEstado());
-                pw.println("----------------------------------------------------------------------\n");
-                if (observaciones.isEmpty()) {
-                    pw.println("No se han registrado observaciones metodológicas para este proyecto.");
-                } else {
-                    for (Observacion obs : observaciones) {
-                        pw.println("[" + obs.getFechaObservacion() + "] Autor: " + obs.getRolAutor() + " (" + obs.getEstadoObservacion() + ")");
-                        pw.println("Detalle: " + obs.getDescripcion());
-                        pw.println("----------------------------------------------------------------------");
-                    }
-                }
-                pw.flush();
-                mostrarAlerta("Observaciones Descargadas", "El archivo de observaciones se descargó en:\n" + archivo.getAbsolutePath());
-                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
-            } catch (Exception e) {
-                mostrarAlerta("Error al descargar", "Error guardando archivo: " + e.getMessage());
+        String[] cabeceras = {"FECHA OBSERVACIÓN", "EVALUADOR / ROL", "ESTADO SUBSANACIÓN", "DETALLE O CORRECCIÓN SOLICITADA"};
+        List<String[]> filas = new ArrayList<>();
+        if (observaciones.isEmpty()) {
+            filas.add(new String[]{"-", "SISTEMA", "SIN OBSERVACIONES", "No existen observaciones registradas para este proyecto."});
+        } else {
+            for (Observacion obs : observaciones) {
+                filas.add(new String[]{
+                    obs.getFechaObservacion() != null ? obs.getFechaObservacion().toString() : "-",
+                    obs.getRolAutor(),
+                    obs.getEstadoObservacion(),
+                    obs.getDescripcion() != null ? obs.getDescripcion() : "-"
+                });
             }
         }
+        ExportadorInstitucional.exportarTablaExcelInstitucional(stage, "HISTORIAL Y EVALUACIÓN DE TITULACIÓN", "CÓDIGO: " + sel.getCodigoProyecto() + " | TÍTULO: " + sel.getTitulo(), cabeceras, filas, "Observaciones_Jefatura_" + sel.getCodigoProyecto());
+    }
+
+    @FXML
+    private void descargarObservacionesPDF(ActionEvent event) {
+        Proyecto sel = tbProyectosAprobacion != null ? tbProyectosAprobacion.getSelectionModel().getSelectedItem() : null;
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto para generar el documento PDF/HTML de sus observaciones.");
+            return;
+        }
+        List<Observacion> observaciones = observacionDAO.listarPorCodigoProyecto(sel.getCodigoProyecto());
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        String[] cabeceras = {"FECHA", "EVALUADOR / ROL", "ESTADO", "DETALLE DE LA OBSERVACIÓN O CORRECCIÓN"};
+        List<String[]> filas = new ArrayList<>();
+        if (observaciones.isEmpty()) {
+            filas.add(new String[]{"-", "SISTEMA", "SIN OBSERVACIONES", "No existen observaciones registradas para este proyecto."});
+        } else {
+            for (Observacion obs : observaciones) {
+                filas.add(new String[]{
+                    obs.getFechaObservacion() != null ? obs.getFechaObservacion().toString() : "-",
+                    obs.getRolAutor(),
+                    obs.getEstadoObservacion(),
+                    obs.getDescripcion() != null ? obs.getDescripcion() : "-"
+                });
+            }
+        }
+        ExportadorInstitucional.exportarDocumentoPdfHtmlInstitucional(stage, "EVALUACIÓN Y DICTAMEN DE TITULACIÓN", "EXPEDIENTE: " + sel.getCodigoProyecto() + " | " + sel.getTitulo(), "JEFATURA DE INVESTIGACIÓN", cabeceras, filas, "Reporte_Obs_Jefatura_" + sel.getCodigoProyecto());
     }
 
     @FXML

@@ -80,10 +80,9 @@
                         </TableView>
                         <HBox alignment="CENTER_RIGHT" spacing="10.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#descargarObservaciones" styleClass="btn-secondary" text="Descargar Obs. (.TXT)" />
-                              <Button mnemonicParsing="false" onAction="#descargarObservacionesExcel" styleClass="btn-primary" text="Descargar Obs. Excel (.CSV)" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservacionesExcel" styleClass="btn-secondary" text="Descargar Obs. Excel (.XLS)" />
                               <Button mnemonicParsing="false" onAction="#descargarObservacionesPDF" styleClass="btn-primary" text="Descargar Obs. PDF/HTML" />
-                              <Button mnemonicParsing="false" onAction="#exportarProyectosExcel" styleClass="btn-secondary" text="Exportar Proyectos (.CSV)" />
+                              <Button mnemonicParsing="false" onAction="#exportarProyectosExcel" styleClass="btn-secondary" text="Exportar Proyectos (.XLS)" />
                            </children>
                         </HBox>
                         
@@ -123,8 +122,7 @@
                         </TableView>
                         <HBox alignment="CENTER_RIGHT" spacing="10.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#descargarObservaciones" styleClass="btn-secondary" text="Descargar Obs. (.TXT)" />
-                              <Button mnemonicParsing="false" onAction="#descargarObservacionesExcel" styleClass="btn-primary" text="Descargar Obs. Excel (.CSV)" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservacionesExcel" styleClass="btn-secondary" text="Descargar Obs. Excel (.XLS)" />
                               <Button mnemonicParsing="false" onAction="#descargarObservacionesPDF" styleClass="btn-primary" text="Descargar Obs. PDF/HTML" />
                            </children>
                         </HBox>

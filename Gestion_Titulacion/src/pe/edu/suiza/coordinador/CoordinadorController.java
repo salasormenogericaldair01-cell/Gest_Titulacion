@@ -38,7 +38,9 @@ import pe.edu.suiza.dao.ProyectoDAO;
 import pe.edu.suiza.modelo.Observacion;
 import pe.edu.suiza.modelo.Proyecto;
 import pe.edu.suiza.modelo.Usuario;
+import pe.edu.suiza.utilidades.ExportadorInstitucional;
 import pe.edu.suiza.utilidades.SesionActual;
+import java.util.ArrayList;
 
 /**
  * Controlador de Coordinación Académica.
@@ -297,41 +299,27 @@ public class CoordinadorController implements Initializable {
         List<Observacion> observaciones = obtenerObservacionesLista();
         String codProy = obtenerCodigoProyectoContexto();
         if (observaciones == null || codProy == null) {
-            mostrarAlerta("Selección requerida", "Seleccione un proyecto para descargar sus observaciones en Excel.");
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto para descargar sus observaciones con diseño institucional.");
             return;
         }
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Exportar Observaciones a Excel (.CSV)");
-        fileChooser.setInitialFileName("Observaciones_Excel_" + codProy + ".csv");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo CSV Compatible Excel (*.csv)", "*.csv"));
         Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
-        File archivo = fileChooser.showSaveDialog(stage);
-        if (archivo != null) {
-            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
-                pw.write('\ufeff'); // BOM UTF-8 para abrir directo en Excel con acentos
-                pw.println("CÓDIGO PROYECTO;FECHA OBSERVACIÓN;EVALUADOR / ROL;ESTADO SUBSANACIÓN;DETALLE O CORRECCIÓN SOLICITADA");
-                if (observaciones.isEmpty()) {
-                    pw.println(codProy + ";N/A;COORDINACIÓN;SIN OBSERVACIONES;No existen observaciones registradas en este contexto.");
-                } else {
-                    for (Observacion obs : observaciones) {
-                        String cod = obs.getCodigoProyectoAux() != null ? obs.getCodigoProyectoAux() : codProy;
-                        String det = obs.getDescripcion() != null ? obs.getDescripcion().replace("\"", "\"\"").replace("\n", " ").replace("\r", "") : "";
-                        pw.println(String.format("%s;%s;\"%s\";%s;\"%s\"",
-                            cod,
-                            obs.getFechaObservacion() != null ? obs.getFechaObservacion().toString() : "-",
-                            obs.getRolAutor(),
-                            obs.getEstadoObservacion(),
-                            det
-                        ));
-                    }
-                }
-                pw.flush();
-                mostrarAlerta("Exportación Completa", "Las observaciones se guardaron en Excel:\n" + archivo.getAbsolutePath());
-                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
-            } catch (Exception e) {
-                mostrarAlerta("Error al Exportar", "Ocurrió un error al guardar el archivo Excel: " + e.getMessage());
+        String[] cabeceras = {"CÓDIGO / PROYECTO", "FECHA OBSERVACIÓN", "EVALUADOR / ROL", "ESTADO SUBSANACIÓN", "DETALLE O CORRECCIÓN SOLICITADA"};
+        List<String[]> filas = new ArrayList<>();
+        if (observaciones.isEmpty()) {
+            filas.add(new String[]{codProy, "-", "COORDINACIÓN", "SIN OBSERVACIONES", "No existen observaciones registradas en este contexto."});
+        } else {
+            for (Observacion obs : observaciones) {
+                String cod = obs.getCodigoProyectoAux() != null ? obs.getCodigoProyectoAux() : codProy;
+                filas.add(new String[]{
+                    cod,
+                    obs.getFechaObservacion() != null ? obs.getFechaObservacion().toString() : "-",
+                    obs.getRolAutor(),
+                    obs.getEstadoObservacion(),
+                    obs.getDescripcion() != null ? obs.getDescripcion() : "-"
+                });
             }
         }
+        ExportadorInstitucional.exportarTablaExcelInstitucional(stage, "OBSERVACIONES METODOLÓGICAS - COORDINACIÓN", "REFERENCIA: " + codProy, cabeceras, filas, "Observaciones_Coordinacion_" + codProy);
     }
 
     @FXML
@@ -339,40 +327,27 @@ public class CoordinadorController implements Initializable {
         List<Observacion> observaciones = obtenerObservacionesLista();
         String codProy = obtenerCodigoProyectoContexto();
         if (observaciones == null || codProy == null) {
-            mostrarAlerta("Selección requerida", "Seleccione un proyecto para generar el documento PDF/HTML de sus observaciones.");
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto para generar el documento PDF/HTML con diseño institucional.");
             return;
         }
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Descargar Observaciones en Documento Oficial (PDF/HTML)");
-        fileChooser.setInitialFileName("Reporte_Observaciones_" + codProy + ".html");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Documento Oficial HTML/PDF (*.html)", "*.html"));
         Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
-        File archivo = fileChooser.showSaveDialog(stage);
-        if (archivo != null) {
-            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
-                pw.println("<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><title>Observaciones Coordinación - IESTP Suiza</title>");
-                pw.println("<style>body{font-family:'Segoe UI',sans-serif;margin:40px;color:#1e293b;} h1{color:#1e3a8a;border-bottom:3px solid #dc2626;padding-bottom:10px;} h2{color:#334155;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #cbd5e1;padding:12px;text-align:left;} th{background-color:#1e3a8a;color:white;} tr:nth-child(even){background-color:#f8fafc;} .meta{background:#eff6ff;padding:15px;border-radius:8px;margin-bottom:20px;border-left:4px solid #3b82f6;} .tag{padding:4px 8px;border-radius:4px;font-weight:bold;font-size:0.85em;} .tag-pend{background:#fef3c7;color:#92400e;} .tag-sub{background:#dcfce7;color:#166534;}</style></head><body>");
-                pw.println("<h1>INSTITUTO DE EDUCACIÓN SUPERIOR TECNOLÓGICO PÚBLICO SUIZA</h1>");
-                pw.println("<h2>REPORTE METODOLÓGICO Y CONTROL DE OBSERVACIONES (COORDINACIÓN)</h2>");
-                pw.println("<div class='meta'><b>Referencia / Código:</b> " + codProy + "<br><b>Total de Observaciones:</b> " + observaciones.size() + "<br><b>Fecha de Emisión del Documento:</b> " + LocalDate.now() + "</div>");
-                pw.println("<table><thead><tr><th>Proyecto</th><th>Fecha</th><th>Evaluador / Rol</th><th>Estado</th><th>Detalle de la Observación o Corrección</th></tr></thead><tbody>");
-                if (observaciones.isEmpty()) {
-                    pw.println("<tr><td colspan='5' style='text-align:center;padding:20px;color:#64748b;'>No existen observaciones registradas en este contexto.</td></tr>");
-                } else {
-                    for (Observacion obs : observaciones) {
-                        String cod = obs.getCodigoProyectoAux() != null ? obs.getCodigoProyectoAux() : codProy;
-                        String claseEstado = obs.getEstadoObservacion().contains("SUBSANADO") ? "tag-sub" : "tag-pend";
-                        pw.println("<tr><td><b>" + cod + "</b></td><td>" + (obs.getFechaObservacion()!=null?obs.getFechaObservacion():"-") + "</td><td><b>" + obs.getRolAutor() + "</b></td><td><span class='tag " + claseEstado + "'>" + obs.getEstadoObservacion() + "</span></td><td>" + (obs.getDescripcion()!=null?obs.getDescripcion():"-") + "</td></tr>");
-                    }
-                }
-                pw.println("</tbody></table></body></html>");
-                pw.flush();
-                mostrarAlerta("Documento Oficial PDF/HTML Generado", "El archivo de observaciones para imprimir o PDF se creó en:\n" + archivo.getAbsolutePath());
-                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
-            } catch (Exception e) {
-                mostrarAlerta("Error al Generar Documento", "Ocurrió un error al crear el archivo: " + e.getMessage());
+        String[] cabeceras = {"PROYECTO", "FECHA", "EVALUADOR / ROL", "ESTADO", "DETALLE DE LA OBSERVACIÓN O CORRECCIÓN"};
+        List<String[]> filas = new ArrayList<>();
+        if (observaciones.isEmpty()) {
+            filas.add(new String[]{codProy, "-", "COORDINACIÓN", "SIN OBSERVACIONES", "No existen observaciones registradas en este contexto."});
+        } else {
+            for (Observacion obs : observaciones) {
+                String cod = obs.getCodigoProyectoAux() != null ? obs.getCodigoProyectoAux() : codProy;
+                filas.add(new String[]{
+                    cod,
+                    obs.getFechaObservacion() != null ? obs.getFechaObservacion().toString() : "-",
+                    obs.getRolAutor(),
+                    obs.getEstadoObservacion(),
+                    obs.getDescripcion() != null ? obs.getDescripcion() : "-"
+                });
             }
         }
+        ExportadorInstitucional.exportarDocumentoPdfHtmlInstitucional(stage, "REPORTE E HISTORIAL METODOLÓGICO", "EXPEDIENTE / REFERENCIA: " + codProy, "COORDINACIÓN ACADÉMICA Y METODOLÓGICA", cabeceras, filas, "Reporte_Obs_Coordinacion_" + codProy);
     }
 
 
@@ -382,34 +357,21 @@ public class CoordinadorController implements Initializable {
             mostrarAlerta("Tabla vacía", "No hay proyectos en la tabla para exportar a Excel.");
             return;
         }
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Exportar Proyectos a Excel (.CSV)");
-        fileChooser.setInitialFileName("Listado_Proyectos_Coordinacion_Suiza.csv");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo CSV Compatible Excel (*.csv)", "*.csv"));
         Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
-        File archivo = fileChooser.showSaveDialog(stage);
-        if (archivo != null) {
-            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
-                pw.write('\ufeff'); // BOM UTF-8
-                pw.println("CÓDIGO;TÍTULO DEL PROYECTO;PROGRAMA DE ESTUDIO;MODALIDAD;ASESOR;ESTADO;FECHA REGISTRO");
-                for (Proyecto p : tbProyectos.getItems()) {
-                    pw.println(String.format("%s;\"%s\";\"%s\";\"%s\";\"%s\";%s;%s",
-                        p.getCodigoProyecto(),
-                        p.getTitulo() != null ? p.getTitulo().replace("\"", "\"\"") : "",
-                        p.getProgramaEstudio() != null ? p.getProgramaEstudio().replace("\"", "\"\"") : "",
-                        p.getModalidad() != null ? p.getModalidad().replace("\"", "\"\"") : "",
-                        p.getAsesor() != null ? p.getAsesor().replace("\"", "\"\"") : "",
-                        p.getEstado(),
-                        p.getFechaRegistro() != null ? p.getFechaRegistro().toString() : "-"
-                    ));
-                }
-                pw.flush();
-                mostrarAlerta("Exportación Completa", "El reporte se guardó en:\n" + archivo.getAbsolutePath());
-                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
-            } catch (Exception e) {
-                mostrarAlerta("Error al Exportar", "Error escribiendo el archivo CSV: " + e.getMessage());
-            }
+        String[] cabeceras = {"CÓDIGO", "TÍTULO DEL PROYECTO", "PROGRAMA DE ESTUDIO", "MODALIDAD", "ASESOR", "ESTADO", "FECHA REGISTRO"};
+        List<String[]> filas = new ArrayList<>();
+        for (Proyecto p : tbProyectos.getItems()) {
+            filas.add(new String[]{
+                p.getCodigoProyecto(),
+                p.getTitulo() != null ? p.getTitulo() : "",
+                p.getProgramaEstudio() != null ? p.getProgramaEstudio() : "",
+                p.getModalidad() != null ? p.getModalidad() : "",
+                p.getAsesor() != null ? p.getAsesor() : "",
+                p.getEstado(),
+                p.getFechaRegistro() != null ? p.getFechaRegistro().toString() : "-"
+            });
         }
+        ExportadorInstitucional.exportarTablaExcelInstitucional(stage, "CONSOLIDADO DE EVALUACIÓN DE PROYECTOS", "MÓDULO DE COORDINACIÓN ACADÉMICA", cabeceras, filas, "Listado_Proyectos_Coordinacion_Suiza");
     }
 
     @FXML

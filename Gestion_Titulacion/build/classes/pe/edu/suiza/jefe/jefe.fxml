@@ -80,9 +80,10 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
-                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                                            <HBox alignment="CENTER_RIGHT" spacing="15.0">
                            <children>
-                              <Button mnemonicParsing="false" onAction="#descargarObservaciones" styleClass="btn-secondary" text="Descargar Observaciones" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservacionesExcel" styleClass="btn-secondary" text="Descargar Obs. Excel" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservacionesPDF" styleClass="btn-secondary" text="Descargar Obs. PDF/HTML" />
                               <Button mnemonicParsing="false" onAction="#rechazarProyecto" styleClass="btn-secondary" text="Devolver o Rechazar" />
                               <Button mnemonicParsing="false" onAction="#aprobarProyectoFinal" styleClass="btn-primary" text="Aprobar para Titulación" />
                            </children>
@@ -94,23 +95,45 @@
                      <children>
                         <HBox alignment="CENTER_LEFT" spacing="15.0">
                            <children>
-                              <Label styleClass="card-header-title" text="Gestión y Soporte de Usuarios Institucionales" />
+                              <Label styleClass="card-header-title" text="Gestión de Cuentas del Sistema - Rol y Credenciales" />
                               <Region HBox.hgrow="ALWAYS" />
-                              <Button mnemonicParsing="false" onAction="#nuevoUsuario" styleClass="btn-primary" text="Nuevo Usuario" />
+                              <Button mnemonicParsing="false" onAction="#limpiarFormularioUsuario" styleClass="btn-secondary" text="Nuevo Usuario" />
+                              <Button mnemonicParsing="false" onAction="#generarTicketSoporteTI" styleClass="btn-secondary" text="Generar Ticket TI" />
                            </children>
                         </HBox>
-                        <TableView fx:id="tbUsuarios" VBox.vgrow="ALWAYS">
-                          <columns>
-                            <TableColumn fx:id="colUsuUser" prefWidth="130.0" text="Usuario" />
-                            <TableColumn fx:id="colUsuNom" prefWidth="280.0" text="Nombre Completo" />
-                              <TableColumn fx:id="colUsuRol" prefWidth="180.0" text="Rol Asignado" />
-                              <TableColumn fx:id="colUsuPassClaro" prefWidth="140.0" text="Clave (Soporte TI)" />
-                              <TableColumn fx:id="colUsuEst" prefWidth="100.0" text="Estado" />
-                          </columns>
-                           <columnResizePolicy>
-                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
-                        </TableView>
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox prefWidth="320.0" spacing="12.0">
+                                 <children>
+                                    <Label styleClass="section-subtitle" text="Datos de la Cuenta" />
+                                    <TextField fx:id="txtUsrDni" promptText="DNI (8 dígitos exactos)" styleClass="text-field-form" />
+                                    <TextField fx:id="txtUsrNombre" promptText="Nombre Completo" styleClass="text-field-form" />
+                                    <TextField fx:id="txtUsrCorreo" promptText="Correo Electrónico Institucional" styleClass="text-field-form" />
+                                    <TextField fx:id="txtUsrEspecialidad" promptText="Especialidad / Cargo" styleClass="text-field-form" />
+                                    <ComboBox fx:id="cbUsrRol" prefWidth="320.0" promptText="Rol en el Sistema" styleClass="combo-box-form" />
+                                    <ComboBox fx:id="cbUsrEstado" prefWidth="320.0" promptText="Estado de Cuenta" styleClass="combo-box-form" />
+                                    <HBox spacing="10.0">
+                                       <children>
+                                          <Button fx:id="btnGuardarUsr" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#guardarUsuario" styleClass="btn-primary" text="Guardar" HBox.hgrow="ALWAYS" />
+                                          <Button mnemonicParsing="false" onAction="#eliminarUsuario" styleClass="btn-secondary" text="Eliminar" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <TableView fx:id="tbUsuarios" HBox.hgrow="ALWAYS">
+                                <columns>
+                                  <TableColumn fx:id="colUsuUser" prefWidth="130.0" text="Usuario" />
+                                  <TableColumn fx:id="colUsuNom" prefWidth="250.0" text="Nombre Completo" />
+                                  <TableColumn fx:id="colUsuRol" prefWidth="160.0" text="Rol Asignado" />
+                                  <TableColumn fx:id="colUsuPassClaro" prefWidth="130.0" text="Clave (Soporte TI)" />
+                                  <TableColumn fx:id="colUsuEst" prefWidth="90.0" text="Estado" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
 
@@ -118,23 +141,41 @@
                      <children>
                         <HBox alignment="CENTER_LEFT" spacing="15.0">
                            <children>
-                              <Label styleClass="card-header-title" text="Mantenimiento de Catálogos - Carreras y Modalidades" />
+                              <Label styleClass="card-header-title" text="Administración de Catálogos - Modalidades y Programas" />
                               <Region HBox.hgrow="ALWAYS" />
                               <ComboBox fx:id="cbTipoCatalogo" prefWidth="250.0" promptText="Filtrar tipo de catálogo..." styleClass="combo-box-form" />
-                              <Button mnemonicParsing="false" onAction="#nuevoCatalogo" styleClass="btn-primary" text="Nuevo ítem" />
+                              <Button mnemonicParsing="false" onAction="#limpiarFormularioCatalogo" styleClass="btn-secondary" text="Nuevo Registro" />
                            </children>
                         </HBox>
-                        <TableView fx:id="tbCatalogos" VBox.vgrow="ALWAYS">
-                          <columns>
-                            <TableColumn fx:id="colCatTipo" prefWidth="160.0" text="Tipo de Catálogo" />
-                            <TableColumn fx:id="colCatCod" prefWidth="120.0" text="Código" />
-                              <TableColumn fx:id="colCatNom" prefWidth="280.0" text="Nombre del ítem" />
-                              <TableColumn fx:id="colCatDesc" prefWidth="250.0" text="Descripción" />
-                          </columns>
-                           <columnResizePolicy>
-                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
-                        </TableView>
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox prefWidth="320.0" spacing="12.0">
+                                 <children>
+                                    <Label styleClass="section-subtitle" text="Datos de Categoría" />
+                                    <ComboBox fx:id="cbCatTipo" onAction="#filtrarCatalogoPorTipo" prefWidth="320.0" promptText="Tipo de Catálogo" styleClass="combo-box-form" />
+                                    <TextField fx:id="txtCatValor" promptText="Nombre / Valor del Registro" styleClass="text-field-form" />
+                                    <ComboBox fx:id="cbCatEstado" prefWidth="320.0" promptText="Estado del Registro" styleClass="combo-box-form" />
+                                    <HBox spacing="10.0">
+                                       <children>
+                                          <Button fx:id="btnGuardarCat" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#guardarCatalogo" styleClass="btn-primary" text="Guardar" HBox.hgrow="ALWAYS" />
+                                          <Button mnemonicParsing="false" onAction="#eliminarCatalogo" styleClass="btn-secondary" text="Eliminar" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <TableView fx:id="tbCatalogos" HBox.hgrow="ALWAYS">
+                                <columns>
+                                  <TableColumn fx:id="colCatTipo" prefWidth="160.0" text="Tipo de Catálogo" />
+                                  <TableColumn fx:id="colCatCod" prefWidth="120.0" text="Código" />
+                                  <TableColumn fx:id="colCatNom" prefWidth="280.0" text="Nombre del ítem" />
+                                  <TableColumn fx:id="colCatDesc" prefWidth="250.0" text="Descripción" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TableView>
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
 
@@ -144,7 +185,8 @@
                            <children>
                               <Label styleClass="card-header-title" text="Módulo de Reportes Oficiales IESTP Suiza - Filtro Temporal" />
                               <Region HBox.hgrow="ALWAYS" />
-                              <Button mnemonicParsing="false" onAction="#exportarReporteInstitucional" styleClass="btn-primary" text="Exportar Reporte" />
+                              <Button mnemonicParsing="false" onAction="#descargarReporteExcel" styleClass="btn-secondary" text="Exportar Excel (.XLS)" />
+                              <Button mnemonicParsing="false" onAction="#descargarReportePDF" styleClass="btn-primary" text="Generar PDF/HTML Oficial" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #f8fafc; -fx-padding: 15px; -fx-background-radius: 8px; -fx-border-color: #cbd5e1; -fx-border-radius: 8px;">
