@@ -27,10 +27,23 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Optional;
+import javafx.scene.control.TextInputDialog;
+import javafx.stage.FileChooser;
+
 import pe.edu.suiza.dao.CatalogoDAO;
+import pe.edu.suiza.dao.ObservacionDAO;
 import pe.edu.suiza.dao.ProyectoDAO;
 import pe.edu.suiza.dao.UsuarioDAO;
 import pe.edu.suiza.modelo.Catalogo;
+import pe.edu.suiza.modelo.Observacion;
 import pe.edu.suiza.modelo.Proyecto;
 import pe.edu.suiza.modelo.Usuario;
 import pe.edu.suiza.utilidades.SesionActual;
@@ -91,6 +104,7 @@ public class JefeController implements Initializable {
     private ProyectoDAO proyectoDAO = new ProyectoDAO();
     private UsuarioDAO usuarioDAO = new UsuarioDAO();
     private CatalogoDAO catalogoDAO = new CatalogoDAO();
+    private ObservacionDAO observacionDAO = new ObservacionDAO();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -295,16 +309,36 @@ public class JefeController implements Initializable {
 
     @FXML
     private void nuevoCatalogo(ActionEvent event) {
-        mostrarAlerta("Mantenimiento de Catálogos", "Para insertar una nueva Carrera o Modalidad agregue el registro en la tabla catalogos de XAMPP MySQL.");
+        String tipoSel = cbTipoCatalogo.getValue();
+        if (tipoSel == null || tipoSel.isEmpty()) {
+            mostrarAlerta("Tipo de Catálogo requerido", "Seleccione primero el Tipo de Catálogo en la lista desplegable (Ej: PROGRAMA_ESTUDIO).");
+            return;
+        }
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Nuevo ítem para " + tipoSel);
+        dialog.setHeaderText("Registro de nuevo ítem en " + tipoSel);
+        dialog.setContentText("Ingrese el nombre del nuevo ítem (Ej: Mecatrónica Automotriz):");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(nombre -> {
+            if (!nombre.trim().isEmpty()) {
+                String codigoGen = tipoSel.substring(0, Math.min(3, tipoSel.length())) + "-" + (System.currentTimeMillis() % 10000);
+                Catalogo nuevo = new Catalogo(0, tipoSel, codigoGen, nombre.trim(), "Ítem registrado desde Jefatura", "ACTIVO");
+                if (catalogoDAO.insertar(nuevo)) {
+                    mostrarAlerta("Catálogo Actualizado", "Se registró exitosamente el ítem '" + nombre + "' en " + tipoSel + ".");
+                    cargarDatosCatalogos();
+                } else {
+                    mostrarAlerta("Error", "No se pudo registrar en la base de datos MySQL.");
+                }
+            }
+        });
     }
 
     @FXML
     private void aplicarFiltroReporte(ActionEvent event) {
         LocalDate hoy = LocalDate.now();
-        LocalDate desde;
+        LocalDate desde = hoy.minusYears(5);
         
-        String seleccion = cbRangoTiempo.getValue();
-        if (seleccion == null) seleccion = "";
+        String seleccion = cbRangoTiempo != null && cbRangoTiempo.getValue() != null ? cbRangoTiempo.getValue() : "";
         
         if (seleccion.contains("1 mes")) {
             desde = hoy.minusMonths(1);
@@ -318,23 +352,148 @@ public class JefeController implements Initializable {
             desde = hoy.minusYears(3);
         } else if (seleccion.contains("5 años")) {
             desde = hoy.minusYears(5);
-        } else if (dpFechaDesde.getValue() != null && dpFechaHasta.getValue() != null) {
+        } else if (dpFechaDesde != null && dpFechaHasta != null && dpFechaDesde.getValue() != null && dpFechaHasta.getValue() != null) {
             desde = dpFechaDesde.getValue();
             hoy = dpFechaHasta.getValue();
-        } else {
-            desde = hoy.minusYears(5);
         }
 
         List<Proyecto> resultados = proyectoDAO.listarPorRangoTiempo(desde.toString(), hoy.toString());
-        if (resultados.isEmpty()) {
-            resultados = proyectoDAO.listarTodos();
+        
+        String tipoRep = cbTipoReporte != null && cbTipoReporte.getValue() != null ? cbTipoReporte.getValue() : "";
+        if (!tipoRep.isEmpty() && !"Todos los Proyectos".equals(tipoRep) && !"Consolidado por Programa de Estudio".equals(tipoRep)) {
+            List<Proyecto> filtradosPorTipo = new ArrayList<>();
+            for (Proyecto p : resultados) {
+                if (tipoRep.contains("Aprobados") && p.getEstado().contains("APROBADO")) {
+                    filtradosPorTipo.add(p);
+                } else if (tipoRep.contains("Observados") && (p.getEstado().contains("OBSERVADO") || p.getEstado().contains("RECHAZADO"))) {
+                    filtradosPorTipo.add(p);
+                } else if (tipoRep.contains("Revisión") && p.getEstado().contains("REVISION")) {
+                    filtradosPorTipo.add(p);
+                } else {
+                    filtradosPorTipo.add(p);
+                }
+            }
+            resultados = filtradosPorTipo;
         }
-        tbReportes.setItems(FXCollections.observableArrayList(resultados));
+        if (tbReportes != null) {
+            tbReportes.setItems(FXCollections.observableArrayList(resultados));
+        }
     }
 
     @FXML
     private void exportarReporteInstitucional(ActionEvent event) {
-        mostrarAlerta("Exportar Reporte", "Reporte generado con membrete oficial del IESTP Suiza y rango seleccionado.");
+        descargarReporteExcel(event);
+    }
+
+    @FXML
+    private void descargarReporteExcel(ActionEvent event) {
+        if (tbReportes == null || tbReportes.getItems().isEmpty()) {
+            mostrarAlerta("Tabla vacía", "No hay registros en la tabla para exportar a Excel. Aplique un filtro primero.");
+            return;
+        }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar Reporte en Excel (CSV Compatible)");
+        fileChooser.setInitialFileName("Reporte_Proyectos_Titulacion_Suiza.csv");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo CSV Compatible Excel (*.csv)", "*.csv"));
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showSaveDialog(stage);
+        if (archivo != null) {
+            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
+                pw.write('\ufeff'); // BOM UTF-8 para abrir con acentos exactos en Excel
+                pw.println("FECHA REGISTRO;CÓDIGO PROYECTO;TÍTULO DEL PROYECTO;PROGRAMA DE ESTUDIO;MODALIDAD;ASESOR;ESTADO ACTUAL");
+                for (Proyecto p : tbReportes.getItems()) {
+                    pw.println(String.format("%s;%s;\"%s\";\"%s\";\"%s\";\"%s\";%s",
+                        p.getFechaRegistro() != null ? p.getFechaRegistro().toString() : "N/A",
+                        p.getCodigoProyecto(),
+                        p.getTitulo() != null ? p.getTitulo().replace("\"", "\"\"") : "",
+                        p.getProgramaEstudio() != null ? p.getProgramaEstudio().replace("\"", "\"\"") : "",
+                        p.getModalidad() != null ? p.getModalidad().replace("\"", "\"\"") : "",
+                        p.getAsesor() != null ? p.getAsesor().replace("\"", "\"\"") : "",
+                        p.getEstado()
+                    ));
+                }
+                pw.flush();
+                mostrarAlerta("Exportación Exitosa", "El reporte se guardó correctamente en:\n" + archivo.getAbsolutePath());
+                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
+            } catch (Exception e) {
+                mostrarAlerta("Error al Exportar", "Ocurrió un error al escribir el archivo: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void descargarReportePDF(ActionEvent event) {
+        if (tbReportes == null || tbReportes.getItems().isEmpty()) {
+            mostrarAlerta("Tabla vacía", "No hay registros en la tabla para generar el documento oficial.");
+            return;
+        }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar Documento de Reporte Oficial (HTML/Imprimible)");
+        fileChooser.setInitialFileName("Reporte_Oficial_IESTP_Suiza.html");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Documento Oficial HTML (*.html)", "*.html"));
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showSaveDialog(stage);
+        if (archivo != null) {
+            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
+                pw.println("<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><title>Reporte Oficial IESTP Suiza</title>");
+                pw.println("<style>body{font-family:'Segoe UI',sans-serif;margin:40px;color:#1e293b;} h1{color:#1e3a8a;border-bottom:3px solid #dc2626;padding-bottom:10px;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #cbd5e1;padding:10px;text-align:left;} th{background-color:#1e3a8a;color:white;} tr:nth-child(even){background-color:#f8fafc;} .meta{background:#eff6ff;padding:15px;border-radius:8px;margin-bottom:20px;}</style></head><body>");
+                pw.println("<h1>INSTITUTO DE EDUCACIÓN SUPERIOR TECNOLÓGICO PÚBLICO SUIZA</h1>");
+                pw.println("<h2>REPORTE OFICIAL DE PROYECTOS DE TITULACIÓN</h2>");
+                pw.println("<div class='meta'><b>Fecha de Emisión:</b> " + LocalDate.now() + " | <b>Total Proyectos:</b> " + tbReportes.getItems().size() + "</div>");
+                pw.println("<table><thead><tr><th>Fecha</th><th>Código</th><th>Título del Proyecto</th><th>Programa de Estudio</th><th>Modalidad</th><th>Asesor</th><th>Estado</th></tr></thead><tbody>");
+                for (Proyecto p : tbReportes.getItems()) {
+                    pw.println("<tr><td>" + (p.getFechaRegistro()!=null?p.getFechaRegistro():"-") + "</td><td><b>" + p.getCodigoProyecto() + "</b></td><td>" + p.getTitulo() + "</td><td>" + p.getProgramaEstudio() + "</td><td>" + p.getModalidad() + "</td><td>" + p.getAsesor() + "</td><td><b>" + p.getEstado() + "</b></td></tr>");
+                }
+                pw.println("</tbody></table></body></html>");
+                pw.flush();
+                mostrarAlerta("Reporte Oficial Generado", "El documento oficial para imprimir o guardar en PDF se creó en:\n" + archivo.getAbsolutePath());
+                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
+            } catch (Exception e) {
+                mostrarAlerta("Error al Generar Documento", "Ocurrió un error al crear el reporte oficial: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void descargarObservaciones(ActionEvent event) {
+        Proyecto sel = tbProyectosAprobacion.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto para descargar su historial de observaciones.");
+            return;
+        }
+        List<Observacion> observaciones = observacionDAO.listarPorCodigoProyecto(sel.getCodigoProyecto());
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Descargar Observaciones Metodológicas");
+        fileChooser.setInitialFileName("Observaciones_" + sel.getCodigoProyecto() + ".txt");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo de Texto (*.txt)", "*.txt"));
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showSaveDialog(stage);
+        if (archivo != null) {
+            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
+                pw.println("======================================================================");
+                pw.println("IESTP SUIZA - HISTORIAL DE OBSERVACIONES Y EVALUACIÓN DE TITULACIÓN");
+                pw.println("======================================================================");
+                pw.println("Proyecto: " + sel.getCodigoProyecto());
+                pw.println("Título:   " + sel.getTitulo());
+                pw.println("Carrera:  " + sel.getProgramaEstudio());
+                pw.println("Estado Actual: " + sel.getEstado());
+                pw.println("----------------------------------------------------------------------\n");
+                if (observaciones.isEmpty()) {
+                    pw.println("No se han registrado observaciones metodológicas para este proyecto.");
+                } else {
+                    for (Observacion obs : observaciones) {
+                        pw.println("[" + obs.getFechaObservacion() + "] Autor: " + obs.getRolAutor() + " (" + obs.getEstadoObservacion() + ")");
+                        pw.println("Detalle: " + obs.getDescripcion());
+                        pw.println("----------------------------------------------------------------------");
+                    }
+                }
+                pw.flush();
+                mostrarAlerta("Observaciones Descargadas", "El archivo de observaciones se descargó en:\n" + archivo.getAbsolutePath());
+                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
+            } catch (Exception e) {
+                mostrarAlerta("Error al descargar", "Error guardando archivo: " + e.getMessage());
+            }
+        }
     }
 
     @FXML

@@ -23,6 +23,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import pe.edu.suiza.dao.ObservacionDAO;
@@ -210,6 +217,84 @@ public class CoordinadorController implements Initializable {
             cargarProyectosParaRevision();
         } else {
             mostrarAlerta("Error BD", "No se pudo actualizar el estado del proyecto en la base de datos MySQL.");
+        }
+    }
+
+    @FXML
+    private void descargarObservaciones(ActionEvent event) {
+        Proyecto sel = tbProyectos.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto para descargar sus observaciones.");
+            return;
+        }
+        List<Observacion> observaciones = observacionDAO.listarPorCodigoProyecto(sel.getCodigoProyecto());
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Descargar Observaciones Metodológicas (.TXT)");
+        fileChooser.setInitialFileName("Observaciones_Coordinacion_" + sel.getCodigoProyecto() + ".txt");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo de Texto (*.txt)", "*.txt"));
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showSaveDialog(stage);
+        if (archivo != null) {
+            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
+                pw.println("======================================================================");
+                pw.println("IESTP SUIZA - EVALUACIÓN Y OBSERVACIONES METODOLÓGICAS (COORDINACIÓN)");
+                pw.println("======================================================================");
+                pw.println("Código:  " + sel.getCodigoProyecto());
+                pw.println("Título:  " + sel.getTitulo());
+                pw.println("Carrera: " + sel.getProgramaEstudio());
+                pw.println("Estado:  " + sel.getEstado());
+                pw.println("----------------------------------------------------------------------\n");
+                if (observaciones.isEmpty()) {
+                    pw.println("No se han registrado observaciones metodológicas.");
+                } else {
+                    for (Observacion obs : observaciones) {
+                        pw.println("[" + obs.getFechaObservacion() + "] Evaluador: " + obs.getRolAutor() + " (" + obs.getEstadoObservacion() + ")");
+                        pw.println("Detalle: " + obs.getDescripcion());
+                        pw.println("----------------------------------------------------------------------");
+                    }
+                }
+                pw.flush();
+                mostrarAlerta("Descarga Exitosa", "Las observaciones se guardaron en:\n" + archivo.getAbsolutePath());
+                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
+            } catch (Exception e) {
+                mostrarAlerta("Error al Descargar", "Ocurrió un error al guardar las observaciones: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void exportarProyectosExcel(ActionEvent event) {
+        if (tbProyectos == null || tbProyectos.getItems().isEmpty()) {
+            mostrarAlerta("Tabla vacía", "No hay proyectos en la tabla para exportar a Excel.");
+            return;
+        }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exportar Proyectos a Excel (.CSV)");
+        fileChooser.setInitialFileName("Listado_Proyectos_Coordinacion_Suiza.csv");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivo CSV Compatible Excel (*.csv)", "*.csv"));
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showSaveDialog(stage);
+        if (archivo != null) {
+            try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(archivo), StandardCharsets.UTF_8))) {
+                pw.write('\ufeff'); // BOM UTF-8
+                pw.println("CÓDIGO;TÍTULO DEL PROYECTO;PROGRAMA DE ESTUDIO;MODALIDAD;ASESOR;ESTADO;FECHA REGISTRO");
+                for (Proyecto p : tbProyectos.getItems()) {
+                    pw.println(String.format("%s;\"%s\";\"%s\";\"%s\";\"%s\";%s;%s",
+                        p.getCodigoProyecto(),
+                        p.getTitulo() != null ? p.getTitulo().replace("\"", "\"\"") : "",
+                        p.getProgramaEstudio() != null ? p.getProgramaEstudio().replace("\"", "\"\"") : "",
+                        p.getModalidad() != null ? p.getModalidad().replace("\"", "\"\"") : "",
+                        p.getAsesor() != null ? p.getAsesor().replace("\"", "\"\"") : "",
+                        p.getEstado(),
+                        p.getFechaRegistro() != null ? p.getFechaRegistro().toString() : "-"
+                    ));
+                }
+                pw.flush();
+                mostrarAlerta("Exportación Completa", "El reporte se guardó en:\n" + archivo.getAbsolutePath());
+                try { Desktop.getDesktop().open(archivo); } catch (Exception ignored) {}
+            } catch (Exception e) {
+                mostrarAlerta("Error al Exportar", "Error escribiendo el archivo CSV: " + e.getMessage());
+            }
         }
     }
 

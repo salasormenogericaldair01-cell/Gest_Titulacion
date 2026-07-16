@@ -22,28 +22,9 @@ Para que el programa guarde los datos permanentemente, necesita que la base de d
 4. Haz clic en el botón verde que dice **`Start`** (o **Iniciar**) justo a la derecha de **`MySQL`**. Espera 2 segundos hasta que la palabra *MySQL* se ponga de color **verde** y aparezca el número `3306` en la columna de puertos.
 5. ¡Listo! Ya puedes minimizar (ocultar) la ventana de XAMPP. Tu base de datos está activa.
 
+> [!NOTE]
 > **💡 ¿QUÉ PASA SI SE ME OLVIDA ENCENDER XAMPP O ESTOY SIN INTERNET/RED?**
 > ¡No te preocupes! El programa cuenta con un **"Salvavidas de Emergencia (Modo Local / Offline)"**. Si intentas entrar y XAMPP está apagado, el sistema no se quedará congelado ni te dará un error fatal; te permitirá ingresar en modo local para que puedas revisar las pantallas y continuar trabajando.
-
----
-
-## 🗄️ PASO 0.1: CÓMO PONER O IMPORTAR LA BASE DE DATOS POR PRIMERA VEZ (EN PHPMYADMIN)
-*(⚠️ Solo haz esto una sola vez cuando recién instalas el sistema en tu computadora nueva)*
-
-El archivo con todas las tablas, usuarios, carreras y proyectos de ejemplo ya viene listo dentro de la carpeta del proyecto y se llama **`BASE_DE_DATOS_SUIZA.sql`**. Para meterlo a tu MySQL, sigue estos pasos explicados como para niños:
-
-1. Asegúrate de haber encendido **Apache** y **MySQL** en tu ventana de XAMPP (como te enseñamos en el **Paso 0**).
-2. Abre tu navegador de internet favorito (*Google Chrome, Microsoft Edge o Firefox*).
-3. En la barra de direcciones de arriba, escribe exactamente esto: **`http://localhost/phpmyadmin`** y presiona la tecla **Enter**. *(También puedes abrirlo haciendo clic en el botón **`Admin`** al lado de MySQL en la ventana de XAMPP).*
-4. Se abrirá la pantalla web de administración de bases de datos (**phpMyAdmin**).
-5. En la parte superior de la página web, busca la pestaña que dice **`Importar`** *(o **`Import`** si tu navegador está en inglés)* y hazle clic.
-6. En el centro de la pantalla verás un botón que dice **`Seleccionar archivo`** *(o **`Choose File`** / **`Examinar`**)*. Haz clic en ese botón.
-7. Se abrirá la ventanita de Windows para buscar archivos. Ve a la carpeta donde tienes tu proyecto:
-   * Busca en: `C:\Users\Geric\Desktop\Gest_Titulacion\` o dentro de `Gestion_Titulacion\`.
-   * Haz doble clic sobre el archivo llamado **`BASE_DE_DATOS_SUIZA.sql`**.
-8. Ahora baja con la rueda de tu mouse hasta el final de la página web y haz clic en el botón azul o verde que dice **`Importar`** *(o **`Continuar`** / **`Go`**)*.
-9. Espera unos 3 o 4 segundos. Verás aparecer un recuadro verde con el mensaje: **`Importación ejecutada exitosamente, se han ejecutado 120 consultas`**.
-10. **¡Y LISTO!** Si miras a la columna de la izquierda de tu navegador, verás que se creó solita la base de datos **`gestion_titulacion_suiza`** con todas sus tablas (`usuarios`, `proyectos`, `estudiantes`, `catalogos`, `observaciones`) y con los datos de ejemplo ya cargados. Ya puedes cerrar el navegador de internet.
 
 ---
 

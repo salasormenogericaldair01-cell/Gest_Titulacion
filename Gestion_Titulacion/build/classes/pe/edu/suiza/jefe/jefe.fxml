@@ -82,6 +82,7 @@
                         </TableView>
                         <HBox alignment="CENTER_RIGHT" spacing="15.0">
                            <children>
+                              <Button mnemonicParsing="false" onAction="#descargarObservaciones" styleClass="btn-secondary" text="Descargar Observaciones" />
                               <Button mnemonicParsing="false" onAction="#rechazarProyecto" styleClass="btn-secondary" text="Devolver o Rechazar" />
                               <Button mnemonicParsing="false" onAction="#aprobarProyectoFinal" styleClass="btn-primary" text="Aprobar para Titulación" />
                            </children>
@@ -186,6 +187,12 @@
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                            </columnResizePolicy>
                         </TableView>
+                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#descargarReporteExcel" styleClass="btn-secondary" text="Descargar en Excel (.CSV)" />
+                              <Button mnemonicParsing="false" onAction="#descargarReportePDF" styleClass="btn-primary" text="Descargar Oficial (.TXT/.HTML)" />
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                </children>
