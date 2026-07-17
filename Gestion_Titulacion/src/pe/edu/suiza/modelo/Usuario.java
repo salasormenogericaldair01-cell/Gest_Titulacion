@@ -48,4 +48,11 @@ public class Usuario {
 
     public Timestamp getFechaRegistro() { return fechaRegistro; }
     public void setFechaRegistro(Timestamp fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+
+    private String email;
+    private String especialidad;
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getEspecialidad() { return especialidad; }
+    public void setEspecialidad(String especialidad) { this.especialidad = especialidad; }
 }

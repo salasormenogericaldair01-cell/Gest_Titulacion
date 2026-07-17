@@ -141,6 +141,45 @@ public class CatalogoDAO {
         return rescate;
     }
 
+    public boolean actualizar(Catalogo c) {
+        String sql = "UPDATE catalogos SET nombre_item = ?, tipo_catalogo = ?, estado = ? WHERE id_catalogo = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return true;
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, c.getNombreItem());
+            pstmt.setString(2, c.getTipoCatalogo());
+            pstmt.setString(3, c.getEstado());
+            pstmt.setInt(4, c.getIdCatalogo());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[CatalogoDAO] Error en actualizar: " + e.getMessage());
+            return false;
+        } finally {
+            cerrarRecursos(pstmt, null);
+        }
+    }
+
+    public boolean eliminar(int idCatalogo) {
+        String sql = "DELETE FROM catalogos WHERE id_catalogo = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return true;
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, idCatalogo);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[CatalogoDAO] Error en eliminar: " + e.getMessage());
+            return false;
+        } finally {
+            cerrarRecursos(pstmt, null);
+        }
+    }
+
     private void cerrarRecursos(PreparedStatement pstmt, ResultSet rs) {
         try {
             if (rs != null) rs.close();

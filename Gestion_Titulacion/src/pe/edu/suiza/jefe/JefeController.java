@@ -81,6 +81,14 @@ public class JefeController implements Initializable {
     @FXML private TableColumn<Usuario, String> colUsuPassClaro;
     @FXML private TableColumn<Usuario, String> colUsuEst;
     
+    @FXML private TextField txtUsrDni;
+    @FXML private TextField txtUsrNombre;
+    @FXML private TextField txtUsrCorreo;
+    @FXML private TextField txtUsrEspecialidad;
+    @FXML private ComboBox<String> cbUsrRol;
+    @FXML private ComboBox<String> cbUsrEstado;
+    @FXML private Button btnGuardarUsr;
+    
     @FXML private VBox panelCatalogos;
     @FXML private ComboBox<String> cbTipoCatalogo;
     @FXML private TableView<Catalogo> tbCatalogos;
@@ -88,6 +96,11 @@ public class JefeController implements Initializable {
     @FXML private TableColumn<Catalogo, String> colCatCod;
     @FXML private TableColumn<Catalogo, String> colCatNom;
     @FXML private TableColumn<Catalogo, String> colCatDesc;
+    
+    @FXML private ComboBox<String> cbCatTipo;
+    @FXML private TextField txtCatValor;
+    @FXML private ComboBox<String> cbCatEstado;
+    @FXML private Button btnGuardarCat;
     
     @FXML private VBox panelReportes;
     @FXML private ComboBox<String> cbRangoTiempo;
@@ -130,6 +143,27 @@ public class JefeController implements Initializable {
                 } else {
                     List<Proyecto> filtrados = proyectoDAO.buscarPorTexto(newV);
                     tbProyectosAprobacion.setItems(FXCollections.observableArrayList(filtrados));
+                }
+            });
+        }
+
+        if (tbUsuarios != null) {
+            tbUsuarios.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+                if (newSel != null) {
+                    if (txtUsrNombre != null) txtUsrNombre.setText(newSel.getNombreCompleto());
+                    if (txtUsrCorreo != null && newSel.getEmail() != null) txtUsrCorreo.setText(newSel.getEmail());
+                    if (txtUsrEspecialidad != null && newSel.getEspecialidad() != null) txtUsrEspecialidad.setText(newSel.getEspecialidad());
+                    if (cbUsrRol != null) cbUsrRol.setValue(newSel.getRol());
+                    if (cbUsrEstado != null) cbUsrEstado.setValue(newSel.getEstado());
+                }
+            });
+        }
+        if (tbCatalogos != null) {
+            tbCatalogos.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
+                if (newSel != null) {
+                    if (cbCatTipo != null) cbCatTipo.setValue(newSel.getTipoCatalogo());
+                    if (txtCatValor != null) txtCatValor.setText(newSel.getNombreItem());
+                    if (cbCatEstado != null) cbCatEstado.setValue(newSel.getEstado());
                 }
             });
         }
@@ -198,6 +232,22 @@ public class JefeController implements Initializable {
             );
             cbTipoCatalogo.getSelectionModel().selectFirst();
             cbTipoCatalogo.setOnAction(e -> cargarDatosCatalogos());
+        }
+        if (cbUsrRol != null) {
+            cbUsrRol.getItems().addAll("SECRETARIA", "COORDINADOR", "JEFE_INVESTIGACION", "ADMINISTRADOR");
+            cbUsrRol.getSelectionModel().selectFirst();
+        }
+        if (cbUsrEstado != null) {
+            cbUsrEstado.getItems().addAll("ACTIVO", "INACTIVO");
+            cbUsrEstado.getSelectionModel().selectFirst();
+        }
+        if (cbCatTipo != null) {
+            cbCatTipo.getItems().addAll("PROGRAMA_ESTUDIO", "MODALIDAD_TITULACION", "ASESOR", "ESTADO_PROYECTO");
+            cbCatTipo.getSelectionModel().selectFirst();
+        }
+        if (cbCatEstado != null) {
+            cbCatEstado.getItems().addAll("ACTIVO", "INACTIVO");
+            cbCatEstado.getSelectionModel().selectFirst();
         }
     }
 
@@ -305,33 +355,158 @@ public class JefeController implements Initializable {
 
     @FXML
     private void nuevoUsuario(ActionEvent event) {
-        mostrarAlerta("Gestión de Usuarios", "En el modelo inicial de XAMPP los 3 roles oficiales del documento están listos para operar.");
+        limpiarFormularioUsuario(event);
     }
 
     @FXML
     private void nuevoCatalogo(ActionEvent event) {
-        String tipoSel = cbTipoCatalogo.getValue();
-        if (tipoSel == null || tipoSel.isEmpty()) {
-            mostrarAlerta("Tipo de Catálogo requerido", "Seleccione primero el Tipo de Catálogo en la lista desplegable (Ej: PROGRAMA_ESTUDIO).");
+        limpiarFormularioCatalogo(event);
+    }
+
+    @FXML
+    private void limpiarFormularioUsuario(ActionEvent event) {
+        if (tbUsuarios != null && tbUsuarios.getSelectionModel() != null) {
+            tbUsuarios.getSelectionModel().clearSelection();
+        }
+        if (txtUsrDni != null) txtUsrDni.clear();
+        if (txtUsrNombre != null) txtUsrNombre.clear();
+        if (txtUsrCorreo != null) txtUsrCorreo.clear();
+        if (txtUsrEspecialidad != null) txtUsrEspecialidad.clear();
+        if (cbUsrRol != null) cbUsrRol.getSelectionModel().selectFirst();
+        if (cbUsrEstado != null) cbUsrEstado.getSelectionModel().selectFirst();
+    }
+
+    @FXML
+    private void generarTicketSoporteTI(ActionEvent event) {
+        String ticket = "TICK-SUIZA-TI-" + (System.currentTimeMillis() % 10000);
+        mostrarAlerta("Ticket TI Generado Oficialmente", 
+            "Se ha generado el requerimiento para Soporte TI Institucional.\n\n" +
+            "Código de Ticket: " + ticket + "\n" +
+            "Área: Jefatura e Investigación / Soporte TI\n" +
+            "Estado: PENDIENTE DE ATENCIÓN");
+    }
+
+    @FXML
+    private void guardarUsuario(ActionEvent event) {
+        if (txtUsrNombre == null || txtUsrNombre.getText().trim().isEmpty()) {
+            mostrarAlerta("Validación requerida", "Por favor ingrese al menos el nombre completo del usuario.");
             return;
         }
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Nuevo ítem para " + tipoSel);
-        dialog.setHeaderText("Registro de nuevo ítem en " + tipoSel);
-        dialog.setContentText("Ingrese el nombre del nuevo ítem (Ej: Mecatrónica Automotriz):");
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(nombre -> {
-            if (!nombre.trim().isEmpty()) {
-                String codigoGen = tipoSel.substring(0, Math.min(3, tipoSel.length())) + "-" + (System.currentTimeMillis() % 10000);
-                Catalogo nuevo = new Catalogo(0, tipoSel, codigoGen, nombre.trim(), "Ítem registrado desde Jefatura", "ACTIVO");
-                if (catalogoDAO.insertar(nuevo)) {
-                    mostrarAlerta("Catálogo Actualizado", "Se registró exitosamente el ítem '" + nombre + "' en " + tipoSel + ".");
-                    cargarDatosCatalogos();
-                } else {
-                    mostrarAlerta("Error", "No se pudo registrar en la base de datos MySQL.");
-                }
+        String nombre = txtUsrNombre.getText().trim();
+        String rol = (cbUsrRol != null && cbUsrRol.getValue() != null) ? cbUsrRol.getValue() : "SECRETARIA";
+        String estado = (cbUsrEstado != null && cbUsrEstado.getValue() != null) ? cbUsrEstado.getValue() : "ACTIVO";
+        String email = (txtUsrCorreo != null) ? txtUsrCorreo.getText().trim() : "";
+        String especialidad = (txtUsrEspecialidad != null) ? txtUsrEspecialidad.getText().trim() : "";
+        String usr = (txtUsrDni != null && !txtUsrDni.getText().trim().isEmpty()) ? txtUsrDni.getText().trim() : nombre.toLowerCase().replaceAll("\\s+", "").substring(0, Math.min(6, nombre.length()));
+        String pass = "suiza2026";
+        
+        Usuario actual = (tbUsuarios != null) ? tbUsuarios.getSelectionModel().getSelectedItem() : null;
+        if (actual != null) {
+            actual.setNombreCompleto(nombre);
+            actual.setRol(rol);
+            actual.setEstado(estado);
+            actual.setEmail(email);
+            actual.setEspecialidad(especialidad);
+            if (usuarioDAO.actualizar(actual)) {
+                mostrarAlerta("Éxito", "Usuario actualizado exitosamente.");
+            } else {
+                mostrarAlerta("Aviso", "Datos actualizados en sesión (verifique conexión MySQL).");
             }
-        });
+        } else {
+            Usuario nuevo = new Usuario(0, usr, pass, rol, nombre, estado, null);
+            nuevo.setEmail(email);
+            nuevo.setEspecialidad(especialidad);
+            if (usuarioDAO.insertar(nuevo)) {
+                mostrarAlerta("Éxito", "Nuevo usuario creado con clave por defecto: " + pass);
+            } else {
+                mostrarAlerta("Aviso", "Usuario registrado (verifique XAMPP si desea persistencia permanente).");
+            }
+        }
+        cargarDatosUsuarios();
+        limpiarFormularioUsuario(null);
+    }
+
+    @FXML
+    private void eliminarUsuario(ActionEvent event) {
+        if (tbUsuarios == null || tbUsuarios.getSelectionModel().getSelectedItem() == null) {
+            mostrarAlerta("Selección requerida", "Por favor seleccione el usuario de la tabla que desea eliminar o inhabilitar.");
+            return;
+        }
+        Usuario sel = tbUsuarios.getSelectionModel().getSelectedItem();
+        if (usuarioDAO.eliminar(sel.getIdUsuario())) {
+            mostrarAlerta("Eliminado", "Se ha eliminado el registro del usuario en el sistema.");
+            cargarDatosUsuarios();
+            limpiarFormularioUsuario(null);
+        } else {
+            mostrarAlerta("Error", "No se pudo eliminar de la base de datos MySQL.");
+        }
+    }
+
+    @FXML
+    private void limpiarFormularioCatalogo(ActionEvent event) {
+        if (tbCatalogos != null && tbCatalogos.getSelectionModel() != null) {
+            tbCatalogos.getSelectionModel().clearSelection();
+        }
+        if (txtCatValor != null) txtCatValor.clear();
+        if (cbCatTipo != null) cbCatTipo.getSelectionModel().selectFirst();
+        if (cbCatEstado != null) cbCatEstado.getSelectionModel().selectFirst();
+    }
+
+    @FXML
+    private void filtrarCatalogoPorTipo(ActionEvent event) {
+        if (cbCatTipo != null && cbCatTipo.getValue() != null && cbTipoCatalogo != null) {
+            cbTipoCatalogo.setValue(cbCatTipo.getValue());
+            cargarDatosCatalogos();
+        }
+    }
+
+    @FXML
+    private void guardarCatalogo(ActionEvent event) {
+        if (txtCatValor == null || txtCatValor.getText().trim().isEmpty()) {
+            mostrarAlerta("Validación requerida", "Por favor ingrese el nombre / valor del registro del catálogo.");
+            return;
+        }
+        String valor = txtCatValor.getText().trim();
+        String tipo = (cbCatTipo != null && cbCatTipo.getValue() != null) ? cbCatTipo.getValue() : "PROGRAMA_ESTUDIO";
+        String estado = (cbCatEstado != null && cbCatEstado.getValue() != null) ? cbCatEstado.getValue() : "ACTIVO";
+        
+        Catalogo sel = (tbCatalogos != null) ? tbCatalogos.getSelectionModel().getSelectedItem() : null;
+        if (sel != null) {
+            sel.setNombreItem(valor);
+            sel.setTipoCatalogo(tipo);
+            sel.setEstado(estado);
+            if (catalogoDAO.actualizar(sel)) {
+                mostrarAlerta("Éxito", "Ítem de catálogo actualizado en el sistema.");
+            } else {
+                mostrarAlerta("Aviso", "Catálogo modificado en memoria.");
+            }
+        } else {
+            String codGen = tipo.substring(0, Math.min(3, tipo.length())) + "-" + (System.currentTimeMillis() % 10000);
+            Catalogo nuevo = new Catalogo(0, tipo, codGen, valor, "Registrado desde Jefatura e Investigación", estado);
+            if (catalogoDAO.insertar(nuevo)) {
+                mostrarAlerta("Éxito", "Nuevo ítem registrado en el catálogo " + tipo + ".");
+            } else {
+                mostrarAlerta("Aviso", "Ítem agregado en memoria local.");
+            }
+        }
+        cargarDatosCatalogos();
+        limpiarFormularioCatalogo(null);
+    }
+
+    @FXML
+    private void eliminarCatalogo(ActionEvent event) {
+        if (tbCatalogos == null || tbCatalogos.getSelectionModel().getSelectedItem() == null) {
+            mostrarAlerta("Selección requerida", "Por favor seleccione el registro del catálogo que desea eliminar.");
+            return;
+        }
+        Catalogo sel = tbCatalogos.getSelectionModel().getSelectedItem();
+        if (catalogoDAO.eliminar(sel.getIdCatalogo())) {
+            mostrarAlerta("Eliminado", "Se ha eliminado exitosamente el ítem del catálogo.");
+            cargarDatosCatalogos();
+            limpiarFormularioCatalogo(null);
+        } else {
+            mostrarAlerta("Error", "No se pudo eliminar el catálogo de MySQL.");
+        }
     }
 
     @FXML

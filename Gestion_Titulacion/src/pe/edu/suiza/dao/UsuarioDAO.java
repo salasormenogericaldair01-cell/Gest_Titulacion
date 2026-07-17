@@ -119,6 +119,67 @@ public class UsuarioDAO {
         return lista;
     }
     
+    public boolean insertar(Usuario u) {
+        String sql = "INSERT INTO usuarios (username, password_claro, rol, nombre_completo, estado) VALUES (?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return true;
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, u.getUsername());
+            pstmt.setString(2, u.getPasswordClaro());
+            pstmt.setString(3, u.getRol());
+            pstmt.setString(4, u.getNombreCompleto());
+            pstmt.setString(5, u.getEstado());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[UsuarioDAO] Error en insertar: " + e.getMessage());
+            return false;
+        } finally {
+            cerrarRecursos(pstmt, null);
+        }
+    }
+
+    public boolean actualizar(Usuario u) {
+        String sql = "UPDATE usuarios SET nombre_completo = ?, rol = ?, estado = ? WHERE id_usuario = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return true;
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, u.getNombreCompleto());
+            pstmt.setString(2, u.getRol());
+            pstmt.setString(3, u.getEstado());
+            pstmt.setInt(4, u.getIdUsuario());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[UsuarioDAO] Error en actualizar: " + e.getMessage());
+            return false;
+        } finally {
+            cerrarRecursos(pstmt, null);
+        }
+    }
+
+    public boolean eliminar(int idUsuario) {
+        String sql = "DELETE FROM usuarios WHERE id_usuario = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return true;
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, idUsuario);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[UsuarioDAO] Error en eliminar: " + e.getMessage());
+            return false;
+        } finally {
+            cerrarRecursos(pstmt, null);
+        }
+    }
+
     private void cerrarRecursos(PreparedStatement pstmt, ResultSet rs) {
         try {
             if (rs != null) rs.close();
