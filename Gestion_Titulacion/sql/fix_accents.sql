@@ -1,14 +1,40 @@
 SET NAMES utf8mb4;
-UPDATE proyectos SET titulo = 'Sistema Inteligente de Gestión Hospitalaria y Control de Triage MediConnect en IESTP Suiza', programa_estudio = 'Desarrollo de Sistemas de Información', modalidad = 'Tesis o Proyecto de Aplicación Profesional' WHERE id_proyecto = 1;
-UPDATE proyectos SET titulo = 'Plataforma Web para el Control de Almacén e Inventarios con Código de Barras en Pucallpa', programa_estudio = 'Desarrollo de Sistemas de Información' WHERE id_proyecto = 2;
-UPDATE proyectos SET titulo = 'Evaluación de los Procesos Contables y Auditoría Digital en Mypes de la Región Ucayali', programa_estudio = 'Contabilidad' WHERE id_proyecto = 3;
-UPDATE proyectos SET titulo = 'Sistema Móvil para el Segregado de Residuos Hospitalarios y Protocolos de Bioseguridad', programa_estudio = 'Enfermería Técnica' WHERE id_proyecto = 4;
-UPDATE catalogos SET nombre_item = 'Desarrollo de Sistemas de Información' WHERE id_catalogo = 1;
-UPDATE catalogos SET nombre_item = 'Enfermería Técnica' WHERE id_catalogo = 3;
-UPDATE catalogos SET nombre_item = 'Administración de Empresas' WHERE id_catalogo = 4;
-UPDATE catalogos SET nombre_item = 'Tesis o Proyecto de Aplicación Profesional' WHERE id_catalogo = 5;
-UPDATE catalogos SET nombre_item = 'Dra. María Gonzales' WHERE id_catalogo = 10;
-UPDATE catalogos SET nombre_item = 'Ing. Fernando Gómez López' WHERE id_catalogo = 11;
+
+-- Limpiamos y recreamos con los 23 catálogos oficiales de IESTP Suiza en UTF-8 perfecto
+TRUNCATE TABLE catalogos;
+
+INSERT INTO catalogos (id_catalogo, tipo_catalogo, nombre_item, codigo_item, descripcion, estado) VALUES 
+(1, 'PROGRAMA_ESTUDIO', 'ADMINISTRACIÓN DE OPERACIONES TURÍSTICAS', 'AOT', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+(2, 'PROGRAMA_ESTUDIO', 'ASISTENCIA ADMINISTRATIVA', 'AA', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+(3, 'PROGRAMA_ESTUDIO', 'CONTABILIDAD', 'CONT', 'Carrera orientada a sistemas financieros y auditoría contable.', 'ACTIVO'),
+(4, 'PROGRAMA_ESTUDIO', 'CONSTRUCCIÓN CIVIL', 'CC', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+(5, 'PROGRAMA_ESTUDIO', 'GESTIÓN ADMINISTRATIVA', 'GA', 'Gestión empresarial y finanzas organizacionales.', 'ACTIVO'),
+(6, 'PROGRAMA_ESTUDIO', 'DESARROLLO DE SISTEMAS DE INFORMACIÓN', 'DSI', 'Carrera Tecnológica de 3 años orientada a software y bases de datos.', 'ACTIVO'),
+(7, 'PROGRAMA_ESTUDIO', 'ELECTRICIDAD INDUSTRIAL', 'EI', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+(8, 'PROGRAMA_ESTUDIO', 'ENFERMERÍA TÉCNICA', 'ENF', 'Carrera de salud y asistencia clínica asistencial.', 'ACTIVO'),
+(9, 'PROGRAMA_ESTUDIO', 'MANEJO FORESTAL', 'MF', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+(10, 'PROGRAMA_ESTUDIO', 'MECATRÓNICA AUTOMOTRIZ', 'MA', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+(11, 'PROGRAMA_ESTUDIO', 'PRODUCCIÓN AGROPECUARIA', 'PA', 'Carrera Técnica Profesional de 3 años.', 'ACTIVO'),
+(12, 'MODALIDAD_TITULACION', 'Tesis o Proyecto de Aplicación Profesional', 'MOD-INVEST', 'Tesis o trabajo de aplicación profesional con desarrollo tecnológico.', 'ACTIVO'),
+(13, 'MODALIDAD_TITULACION', 'Examen de Suficiencia Profesional', 'MOD-SUFIC', 'Evaluación teórico-práctica para egresados de la institución.', 'ACTIVO'),
+(14, 'MODALIDAD_TITULACION', 'Perfil del Proyecto', 'MOD-PERFIL', 'Propuesta inicial o anteproyecto técnico sustentado ante jurado.', 'ACTIVO'),
+(15, 'ASESOR', 'Ing. Ruber Torres Arevalo', 'ASE-001', 'Especialista en Inteligencia Artificial y Gestión de Sistemas.', 'ACTIVO'),
+(16, 'ASESOR', 'Lic. Carlos Mendoza', 'ASE-002', 'Especialista en Bases de Datos y Arquitectura de Software.', 'ACTIVO'),
+(17, 'ASESOR', 'Dra. María Gonzales', 'ASE-003', 'Especialista en Metodología de la Investigación.', 'ACTIVO'),
+(18, 'ASESOR', 'Ing. Fernando Gómez López', 'ASE-004', 'Especialista en Redes, Seguridad de la Información y Cloud.', 'ACTIVO'),
+(19, 'ESTADO_PROYECTO', 'EN_REVISION', 'EST-REV', 'Proyecto bajo evaluación del Coordinador Académico.', 'ACTIVO'),
+(20, 'ESTADO_PROYECTO', 'APROBADO_COORDINACION', 'EST-APROB-COORD', 'Proyecto visado por Coordinación, pasa a Jefatura de Investigación.', 'ACTIVO'),
+(21, 'ESTADO_PROYECTO', 'OBSERVADO', 'EST-OBS', 'Proyecto devuelto con observaciones para subsanación.', 'ACTIVO'),
+(22, 'ESTADO_PROYECTO', 'APROBADO_FINAL', 'EST-APROB-JEFE', 'Proyecto aprobado finalmente para sustentar o recibir título.', 'ACTIVO'),
+(23, 'ESTADO_PROYECTO', 'RECHAZADO', 'EST-RECH', 'Proyecto rechazado por incumplimiento o duplicidad.', 'ACTIVO');
+
+-- Actualizamos proyectos existentes a carreras válidas y con tildes correctas
+UPDATE proyectos SET programa_estudio = 'DESARROLLO DE SISTEMAS DE INFORMACIÓN' WHERE programa_estudio LIKE '%Desarrollo%Sistemas%';
+UPDATE proyectos SET programa_estudio = 'CONTABILIDAD' WHERE programa_estudio LIKE '%Contabilidad%';
+UPDATE proyectos SET programa_estudio = 'ENFERMERÍA TÉCNICA' WHERE programa_estudio LIKE '%Enfermería%';
+UPDATE proyectos SET programa_estudio = 'GESTIÓN ADMINISTRATIVA' WHERE programa_estudio LIKE '%Administración%Empresas%';
+
+-- Actualizamos tildes en usuarios y estudiantes
 UPDATE usuarios SET nombre_completo = 'Noelia Bolaños (Atención y Registro)' WHERE id_usuario = 1;
 UPDATE usuarios SET nombre_completo = 'Mg. Ruber Torres Arevalo (Coordinación)' WHERE id_usuario = 2;
 UPDATE usuarios SET nombre_completo = 'Dr. Alejandro Barbaran (Jefatura Investigación)' WHERE id_usuario = 3;

@@ -178,7 +178,7 @@ public class SecretariaController implements Initializable {
             for (Catalogo c : carreras) cbPrograma.getItems().add(c.getNombreItem());
         } else {
             cbPrograma.getItems().addAll(
-                "ADMINISTRACION DE OPERACIONES TURÍSTICAS",
+                "ADMINISTRACIÓN DE OPERACIONES TURÍSTICAS",
                 "ASISTENCIA ADMINISTRATIVA",
                 "CONTABILIDAD",
                 "CONSTRUCCIÓN CIVIL",

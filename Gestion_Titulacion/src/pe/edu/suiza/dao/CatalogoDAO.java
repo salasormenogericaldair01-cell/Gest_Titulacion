@@ -123,7 +123,7 @@ public class CatalogoDAO {
 
     private List<Catalogo> obtenerCatalogosOfflineRespaldo() {
         List<Catalogo> rescate = new ArrayList<>();
-        rescate.add(new Catalogo(1, "PROGRAMA_ESTUDIO", "AOT", "ADMINISTRACION DE OPERACIONES TURÍSTICAS", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
+        rescate.add(new Catalogo(1, "PROGRAMA_ESTUDIO", "AOT", "ADMINISTRACIÓN DE OPERACIONES TURÍSTICAS", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
         rescate.add(new Catalogo(2, "PROGRAMA_ESTUDIO", "AA", "ASISTENCIA ADMINISTRATIVA", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
         rescate.add(new Catalogo(3, "PROGRAMA_ESTUDIO", "CONT", "CONTABILIDAD", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
         rescate.add(new Catalogo(4, "PROGRAMA_ESTUDIO", "CC", "CONSTRUCCIÓN CIVIL", "Carrera Técnica Profesional de 3 años", "ACTIVO"));
