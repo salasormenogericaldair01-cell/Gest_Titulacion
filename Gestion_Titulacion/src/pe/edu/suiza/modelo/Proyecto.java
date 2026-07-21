@@ -18,6 +18,8 @@ public class Proyecto {
     private String estado;
     private Date fechaRegistro;
     private Timestamp fechaActualizacion;
+    private String archivoNombre;
+    private byte[] archivoData;
 
     public Proyecto() {
     }
@@ -32,6 +34,20 @@ public class Proyecto {
         this.estado = estado;
         this.fechaRegistro = fechaRegistro;
         this.fechaActualizacion = fechaActualizacion;
+    }
+
+    public Proyecto(int idProyecto, String codigoProyecto, String titulo, String programaEstudio, String modalidad, String asesor, String estado, Date fechaRegistro, Timestamp fechaActualizacion, String archivoNombre, byte[] archivoData) {
+        this.idProyecto = idProyecto;
+        this.codigoProyecto = codigoProyecto;
+        this.titulo = titulo;
+        this.programaEstudio = programaEstudio;
+        this.modalidad = modalidad;
+        this.asesor = asesor;
+        this.estado = estado;
+        this.fechaRegistro = fechaRegistro;
+        this.fechaActualizacion = fechaActualizacion;
+        this.archivoNombre = archivoNombre;
+        this.archivoData = archivoData;
     }
 
     public int getIdProyecto() { return idProyecto; }
@@ -60,4 +76,11 @@ public class Proyecto {
 
     public Timestamp getFechaActualizacion() { return fechaActualizacion; }
     public void setFechaActualizacion(Timestamp fechaActualizacion) { this.fechaActualizacion = fechaActualizacion; }
+
+    public String getArchivoNombre() { return archivoNombre; }
+    public void setArchivoNombre(String archivoNombre) { this.archivoNombre = archivoNombre; }
+
+    public byte[] getArchivoData() { return archivoData; }
+    public void setArchivoData(byte[] archivoData) { this.archivoData = archivoData; }
 }
+

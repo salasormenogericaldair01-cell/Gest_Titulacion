@@ -66,6 +66,8 @@ CREATE TABLE proyectos (
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     resumen TEXT NULL,
     id_usuario_registro INT NULL,
+    archivo_nombre VARCHAR(255) NULL,
+    archivo_data LONGBLOB NULL,
     INDEX idx_codigo (codigo_proyecto),
     INDEX idx_programa (programa_estudio),
     INDEX idx_modalidad (modalidad),

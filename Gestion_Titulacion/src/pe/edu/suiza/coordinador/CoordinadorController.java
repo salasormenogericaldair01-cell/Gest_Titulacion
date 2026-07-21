@@ -375,6 +375,59 @@ public class CoordinadorController implements Initializable {
     }
 
     @FXML
+    private void descargarDocumentoProyecto(ActionEvent event) {
+        Proyecto sel = tbProyectos.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto de la tabla para descargar el documento adjunto por la Secretaría.");
+            return;
+        }
+        Proyecto bdProy = proyectoDAO.obtenerPorId(sel.getIdProyecto());
+        if (bdProy != null && bdProy.getArchivoData() != null && bdProy.getArchivoData().length > 0) {
+            sel.setArchivoNombre(bdProy.getArchivoNombre());
+            sel.setArchivoData(bdProy.getArchivoData());
+        }
+        if (sel.getArchivoData() == null || sel.getArchivoData().length == 0) {
+            mostrarAlerta("Sin Documento Adjunto", "El proyecto seleccionado (" + sel.getCodigoProyecto() + ") aún no cuenta con un documento o archivo subido por la Secretaría.");
+            return;
+        }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Descargar Documento del Proyecto (PDF y Word)");
+        fileChooser.getExtensionFilters().clear();
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Documento PDF (*.pdf)", "*.pdf"),
+            new FileChooser.ExtensionFilter("Documento Word (*.docx, *.doc)", "*.docx", "*.doc"),
+            new FileChooser.ExtensionFilter("Todos los archivos (*.*)", "*.*")
+        );
+        String nombreDef = sel.getArchivoNombre() != null && !sel.getArchivoNombre().isEmpty() ? sel.getArchivoNombre() : "Documento_" + sel.getCodigoProyecto() + ".pdf";
+        fileChooser.setInitialFileName(nombreDef);
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showSaveDialog(stage);
+        if (archivo != null) {
+            try {
+                String rut = archivo.getAbsolutePath();
+                if (!rut.contains(".") && fileChooser.getSelectedExtensionFilter() != null && fileChooser.getSelectedExtensionFilter().getExtensions() != null && !fileChooser.getSelectedExtensionFilter().getExtensions().isEmpty()) {
+                    String ext = fileChooser.getSelectedExtensionFilter().getExtensions().get(0).replace("*", "");
+                    if (!ext.equals(".*")) {
+                        archivo = new File(rut + ext);
+                    }
+                }
+                java.nio.file.Files.write(archivo.toPath(), sel.getArchivoData());
+                boolean abierto = false;
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+                    try {
+                        Desktop.getDesktop().open(archivo);
+                        abierto = true;
+                    } catch (Exception ignored) {}
+                }
+                String extra = abierto ? "\n\nEl archivo se ha abierto en su aplicación predeterminada para revisión." : "\n\nPuede abrir el archivo directamente desde la carpeta donde lo guardó.";
+                mostrarAlerta("Descarga Exitosa", "El documento (" + archivo.getName() + ") fue guardado correctamente en:\n" + archivo.getAbsolutePath() + extra);
+            } catch (Exception e) {
+                mostrarAlerta("Error al Guardar", "Ocurrió un error al guardar el documento en disco: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
     private void cerrarSesion(ActionEvent event) {
         SesionActual.limpiarSesion();
         try {

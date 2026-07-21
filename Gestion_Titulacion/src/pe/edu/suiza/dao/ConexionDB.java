@@ -14,7 +14,7 @@ public class ConexionDB {
     private static ConexionDB instancia = null;
     private Connection conexion = null;
     
-    private static final String URL = "jdbc:mysql://localhost:3306/gestion_titulacion_suiza?useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true&autoReconnect=true";
+    private static final String URL = "jdbc:mysql://localhost:3306/gestion_titulacion_suiza?useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true&autoReconnect=true&maxAllowedPacket=67108864";
     private static final String USUARIO = "root";
     private static final String CONTRASENA = "";
     
@@ -30,10 +30,30 @@ public class ConexionDB {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conexion = DriverManager.getConnection(URL, USUARIO, CONTRASENA);
             System.out.println("[ConexionDB] Conexión establecida con MySQL XAMPP exitosamente.");
+            verificarYMigrarEsquema(conexion);
         } catch (ClassNotFoundException e) {
             System.err.println("[ConexionDB] Error: Driver JDBC MySQL no encontrado. " + e.getMessage());
         } catch (SQLException e) {
             System.err.println("[ConexionDB] Error al conectar a la BD XAMPP (gestion_titulacion_suiza): " + e.getMessage());
+        }
+    }
+
+    private void verificarYMigrarEsquema(Connection conn) {
+        if (conn == null) return;
+        try (java.sql.Statement stmt = conn.createStatement()) {
+            // Migración automática de columnas de archivo para documentación (PDF, Word, etc.) en proyectos
+            try {
+                stmt.execute("ALTER TABLE proyectos ADD COLUMN archivo_nombre VARCHAR(255) NULL");
+            } catch (SQLException ignored) {}
+            try {
+                stmt.execute("ALTER TABLE proyectos ADD COLUMN archivo_data LONGBLOB NULL");
+            } catch (SQLException ignored) {}
+            // Asegurar que la tabla observaciones acepte TICKET_TI y nulos adecuadamente
+            try {
+                stmt.execute("ALTER TABLE observaciones MODIFY COLUMN id_proyecto INT NULL");
+            } catch (SQLException ignored) {}
+        } catch (Exception e) {
+            System.err.println("[ConexionDB] Aviso en verificación de esquema: " + e.getMessage());
         }
     }
     

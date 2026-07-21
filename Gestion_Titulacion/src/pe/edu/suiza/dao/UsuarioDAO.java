@@ -49,7 +49,7 @@ public class UsuarioDAO {
     }
     
     public String generarTicketRecuperacion(String username) {
-        String sqlVerificar = "SELECT id_usuario FROM usuarios WHERE username = ? AND estado = 'ACTIVO'";
+        String sqlVerificar = "SELECT id_usuario FROM usuarios WHERE (username = ? OR dni = ?)";
         String sqlTicket = "INSERT INTO observaciones (id_proyecto, id_usuario, rol_autor, descripcion, estado_observacion) VALUES (NULL, ?, 'TICKET_TI', ?, 'PENDIENTE')";
         Connection conn = null;
         PreparedStatement pstmtVer = null;
@@ -62,20 +62,22 @@ public class UsuarioDAO {
             
             pstmtVer = conn.prepareStatement(sqlVerificar);
             pstmtVer.setString(1, username);
+            pstmtVer.setString(2, username);
             rs = pstmtVer.executeQuery();
             
+            int numRandom = (int)(Math.random() * 9000) + 1000;
+            String ticket = "TICK-SUIZA-" + numRandom;
+            String descripcion = "SOLICITUD RESETEO CLAVE / SOPORTE TI (" + username + ") - TICKET: " + ticket;
+            
+            pstmtIns = conn.prepareStatement(sqlTicket);
             if (rs.next()) {
-                int idUsuario = rs.getInt("id_usuario");
-                int numRandom = (int)(Math.random() * 9000) + 1000;
-                String ticket = "TICK-SUIZA-" + numRandom;
-                String descripcion = "SOLICITUD RESETEO CLAVE LOCAL - TICKET TI: " + ticket;
-                
-                pstmtIns = conn.prepareStatement(sqlTicket);
-                pstmtIns.setInt(1, idUsuario);
-                pstmtIns.setString(2, descripcion);
-                if (pstmtIns.executeUpdate() > 0) {
-                    return ticket;
-                }
+                pstmtIns.setInt(1, rs.getInt("id_usuario"));
+            } else {
+                pstmtIns.setNull(1, java.sql.Types.INTEGER);
+            }
+            pstmtIns.setString(2, descripcion);
+            if (pstmtIns.executeUpdate() > 0) {
+                return ticket;
             }
         } catch (SQLException e) {
             System.err.println("[UsuarioDAO] Error en generarTicketRecuperacion: " + e.getMessage());

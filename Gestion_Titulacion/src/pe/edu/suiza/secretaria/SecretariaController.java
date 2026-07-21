@@ -80,6 +80,7 @@ public class SecretariaController implements Initializable {
     
     @FXML private VBox panelListado;
     @FXML private TextField txtBuscarProyecto;
+    @FXML private TextField txtObservacionSecretaria;
     @FXML private TableView<Proyecto> tbProyectos;
     @FXML private TableColumn<Proyecto, String> colCodProy;
     @FXML private TableColumn<Proyecto, String> colTitProy;
@@ -87,9 +88,12 @@ public class SecretariaController implements Initializable {
     @FXML private TableColumn<Proyecto, String> colModProy;
     @FXML private TableColumn<Proyecto, String> colAseProy;
     @FXML private TableColumn<Proyecto, String> colEstProy;
+    @FXML private Label lblArchivoRegistro;
 
     private boolean sidebarColapsado = false;
     private ObservableList<Estudiante> listaEstudiantesTemporal = FXCollections.observableArrayList();
+    private File archivoAdjuntoTemporal = null;
+    private byte[] dataArchivoAdjuntoTemporal = null;
     private ProyectoDAO proyectoDAO = new ProyectoDAO();
     private EstudianteDAO estudianteDAO = new EstudianteDAO();
     private CatalogoDAO catalogoDAO = new CatalogoDAO();
@@ -286,6 +290,12 @@ public class SecretariaController implements Initializable {
         dpFechaRegistro.setValue(LocalDate.now());
         listaEstudiantesTemporal.clear();
         actualizarContadorEstudiantes();
+        archivoAdjuntoTemporal = null;
+        dataArchivoAdjuntoTemporal = null;
+        if (lblArchivoRegistro != null) {
+            lblArchivoRegistro.setText("Ningún archivo seleccionado");
+            lblArchivoRegistro.setStyle("-fx-font-style: italic; -fx-text-fill: #475569;");
+        }
     }
 
     @FXML
@@ -320,6 +330,10 @@ public class SecretariaController implements Initializable {
             Date.valueOf(fecha),
             null
         );
+        if (archivoAdjuntoTemporal != null && dataArchivoAdjuntoTemporal != null) {
+            proy.setArchivoNombre(archivoAdjuntoTemporal.getName());
+            proy.setArchivoData(dataArchivoAdjuntoTemporal);
+        }
 
         int idProyectoGenerado = proyectoDAO.insertarProyecto(proy);
 
@@ -487,6 +501,210 @@ public class SecretariaController implements Initializable {
             });
         }
         ExportadorInstitucional.exportarTablaExcelInstitucional(stage, "LISTADO GENERAL DE PROYECTOS REGISTRADOS", "MÓDULO DE SECRETARÍA ACADÉMICA", cabeceras, filas, "Listado_Proyectos_Secretaria_Suiza");
+    }
+
+    @FXML
+    private void subirDocumentoRegistro(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Adjuntar Documento del Proyecto (PDF, Word, Excel, etc.)");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Documentos (*.pdf, *.docx, *.doc, *.txt, *.rtf)", "*.pdf", "*.docx", "*.doc", "*.txt", "*.rtf"),
+            new FileChooser.ExtensionFilter("Hojas de Cálculo y Presentaciones (*.xlsx, *.xls, *.pptx)", "*.xlsx", "*.xls", "*.pptx", "*.ppt"),
+            new FileChooser.ExtensionFilter("Imágenes y Escaneos (*.jpg, *.png)", "*.jpg", "*.png", "*.jpeg"),
+            new FileChooser.ExtensionFilter("Todos los archivos (*.*)", "*.*")
+        );
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showOpenDialog(stage);
+        if (archivo != null) {
+            try {
+                byte[] bytes = java.nio.file.Files.readAllBytes(archivo.toPath());
+                archivoAdjuntoTemporal = archivo;
+                dataArchivoAdjuntoTemporal = bytes;
+                if (lblArchivoRegistro != null) {
+                    lblArchivoRegistro.setText(archivo.getName());
+                    lblArchivoRegistro.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e3a8a;");
+                }
+                mostrarAlerta("Archivo Seleccionado", "Se ha adjuntado '" + archivo.getName() + "' (" + (bytes.length / 1024) + " KB).\nSe guardará en la base de datos al hacer clic en 'Guardar Proyecto Oficial'.");
+            } catch (Exception e) {
+                mostrarAlerta("Error al leer archivo", "No se pudo leer el archivo: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void quitarDocumentoRegistro(ActionEvent event) {
+        if (archivoAdjuntoTemporal == null) {
+            mostrarAlerta("Sin archivo", "No se ha seleccionado ningún archivo adjunto en este formulario.");
+            return;
+        }
+        archivoAdjuntoTemporal = null;
+        dataArchivoAdjuntoTemporal = null;
+        if (lblArchivoRegistro != null) {
+            lblArchivoRegistro.setText("Ningún archivo seleccionado");
+            lblArchivoRegistro.setStyle("-fx-font-style: italic; -fx-text-fill: #475569;");
+        }
+        mostrarAlerta("Archivo quitado", "Se ha descartado el archivo adjunto inicial.");
+    }
+
+    @FXML
+    private void subirDocumentoCatalogo(ActionEvent event) {
+        Proyecto sel = tbProyectos.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto de la tabla para subir o actualizar su documento oficial (rectificado).");
+            return;
+        }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Subir Documento del Proyecto (PDF, Word, Excel, etc.)");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Documentos (*.pdf, *.docx, *.doc, *.txt, *.rtf)", "*.pdf", "*.docx", "*.doc", "*.txt", "*.rtf"),
+            new FileChooser.ExtensionFilter("Hojas de Cálculo y Presentaciones (*.xlsx, *.xls, *.pptx)", "*.xlsx", "*.xls", "*.pptx", "*.ppt"),
+            new FileChooser.ExtensionFilter("Imágenes y Escaneos (*.jpg, *.png)", "*.jpg", "*.png", "*.jpeg"),
+            new FileChooser.ExtensionFilter("Todos los archivos (*.*)", "*.*")
+        );
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showOpenDialog(stage);
+        if (archivo != null) {
+            try {
+                byte[] bytes = java.nio.file.Files.readAllBytes(archivo.toPath());
+                boolean exito = sel.getIdProyecto() > 0 
+                    ? proyectoDAO.subirArchivo(sel.getIdProyecto(), archivo.getName(), bytes)
+                    : proyectoDAO.subirArchivoPorCodigo(sel.getCodigoProyecto(), archivo.getName(), bytes);
+                if (!exito && sel.getIdProyecto() <= 0) {
+                    exito = proyectoDAO.subirArchivoPorCodigo(sel.getCodigoProyecto(), archivo.getName(), bytes);
+                }
+                if (exito) {
+                    sel.setArchivoNombre(archivo.getName());
+                    sel.setArchivoData(bytes);
+                    if ("OBSERVADO".equals(sel.getEstado()) || "RECHAZADO".equals(sel.getEstado())) {
+                        proyectoDAO.cambiarEstado(sel.getCodigoProyecto(), "EN_REVISION");
+                        sel.setEstado("EN_REVISION");
+                        tbProyectos.refresh();
+                        mostrarAlerta("Documento Rectificado y Subido", "El archivo '" + archivo.getName() + "' se subió correctamente.\n\nEl proyecto estaba en estado OBSERVADO/RECHAZADO y ha regresado automáticamente al estado 'EN_REVISION' para la nueva evaluación del Coordinador.");
+                    } else {
+                        tbProyectos.refresh();
+                        mostrarAlerta("Subida Exitosa", "El documento '" + archivo.getName() + "' ha sido adjuntado correctamente al proyecto " + sel.getCodigoProyecto() + " en la base de datos.");
+                    }
+                } else {
+                    mostrarAlerta("Error de Base de Datos", "No se pudo guardar el documento en XAMPP MySQL. Verifique que la base de datos esté activa.");
+                }
+            } catch (Exception e) {
+                mostrarAlerta("Error al leer archivo", "Ocurrió un error: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void eliminarDocumentoCatalogo(ActionEvent event) {
+        Proyecto sel = tbProyectos.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto para eliminar su documento adjunto.");
+            return;
+        }
+        if (sel.getIdProyecto() > 0) {
+            Proyecto bdProy = proyectoDAO.obtenerPorId(sel.getIdProyecto());
+            if (bdProy != null && bdProy.getArchivoNombre() != null && !bdProy.getArchivoNombre().isEmpty()) {
+                sel.setArchivoNombre(bdProy.getArchivoNombre());
+                sel.setArchivoData(bdProy.getArchivoData());
+            }
+        }
+        if (sel.getArchivoNombre() == null || sel.getArchivoNombre().isEmpty()) {
+            mostrarAlerta("Sin Documento", "El proyecto seleccionado (" + sel.getCodigoProyecto() + ") no tiene un documento adjunto en la base de datos.");
+            return;
+        }
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(null, 
+            "¿Está seguro de eliminar el documento adjunto ('" + sel.getArchivoNombre() + "') del proyecto " + sel.getCodigoProyecto() + "?\n\nEsto permitirá volver a subir un archivo rectificado desde cero.",
+            "Confirmar Eliminación de Documento", javax.swing.JOptionPane.YES_NO_OPTION);
+        if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+            boolean exito = sel.getIdProyecto() > 0 
+                ? proyectoDAO.eliminarArchivo(sel.getIdProyecto()) 
+                : proyectoDAO.eliminarArchivoPorCodigo(sel.getCodigoProyecto());
+            if (!exito) {
+                exito = proyectoDAO.eliminarArchivoPorCodigo(sel.getCodigoProyecto());
+            }
+            if (exito) {
+                sel.setArchivoNombre(null);
+                sel.setArchivoData(null);
+                tbProyectos.refresh();
+                mostrarAlerta("Eliminación Exitosa", "Se ha eliminado el documento de la base de datos.\nAhora puede subir el nuevo documento rectificado.");
+            } else {
+                mostrarAlerta("Error", "No se pudo eliminar el archivo en la base de datos MySQL.");
+            }
+        }
+    }
+
+    @FXML
+    private void descargarDocumentoCatalogo(ActionEvent event) {
+        Proyecto sel = tbProyectos.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto para descargar o visualizar su documento oficial.");
+            return;
+        }
+        Proyecto bdProy = proyectoDAO.obtenerPorId(sel.getIdProyecto());
+        if (bdProy != null && bdProy.getArchivoData() != null && bdProy.getArchivoData().length > 0) {
+            sel.setArchivoNombre(bdProy.getArchivoNombre());
+            sel.setArchivoData(bdProy.getArchivoData());
+        }
+        if (sel.getArchivoData() == null || sel.getArchivoData().length == 0) {
+            mostrarAlerta("Sin Documento Adjunto", "El proyecto seleccionado (" + sel.getCodigoProyecto() + ") no cuenta con un documento subido en el servidor.");
+            return;
+        }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Descargar Documento del Proyecto (PDF y Word)");
+        fileChooser.getExtensionFilters().clear();
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Documento PDF (*.pdf)", "*.pdf"),
+            new FileChooser.ExtensionFilter("Documento Word (*.docx, *.doc)", "*.docx", "*.doc"),
+            new FileChooser.ExtensionFilter("Todos los archivos (*.*)", "*.*")
+        );
+        String nombreDef = sel.getArchivoNombre() != null && !sel.getArchivoNombre().isEmpty() ? sel.getArchivoNombre() : "Documento_" + sel.getCodigoProyecto() + ".pdf";
+        fileChooser.setInitialFileName(nombreDef);
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showSaveDialog(stage);
+        if (archivo != null) {
+            try {
+                String rut = archivo.getAbsolutePath();
+                if (!rut.contains(".") && fileChooser.getSelectedExtensionFilter() != null && fileChooser.getSelectedExtensionFilter().getExtensions() != null && !fileChooser.getSelectedExtensionFilter().getExtensions().isEmpty()) {
+                    String ext = fileChooser.getSelectedExtensionFilter().getExtensions().get(0).replace("*", "");
+                    if (!ext.equals(".*")) {
+                        archivo = new File(rut + ext);
+                    }
+                }
+                java.nio.file.Files.write(archivo.toPath(), sel.getArchivoData());
+                boolean abierto = false;
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+                    try {
+                        Desktop.getDesktop().open(archivo);
+                        abierto = true;
+                    } catch (Exception ignored) {}
+                }
+                String extra = abierto ? "\n\nEl archivo se ha abierto en su aplicación predeterminada para revisión." : "\n\nPuede abrir el archivo directamente desde la carpeta donde lo guardó.";
+                mostrarAlerta("Descarga Exitosa", "El documento (" + archivo.getName() + ") fue guardado correctamente en:\n" + archivo.getAbsolutePath() + extra);
+            } catch (Exception e) {
+                mostrarAlerta("Error al Guardar", "Ocurrió un error al guardar el documento en disco: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void emitirObservacionSecretaria(ActionEvent event) {
+        Proyecto sel = tbProyectos.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto de la tabla para emitir una observación o nota.");
+            return;
+        }
+        String obs = txtObservacionSecretaria != null ? txtObservacionSecretaria.getText().trim() : "";
+        if (obs.isEmpty()) {
+            mostrarAlerta("Texto Requerido", "Escriba el detalle de la observación o nota que desea agregar al expediente del proyecto.");
+            return;
+        }
+        int idUsr = SesionActual.haySesionActiva() ? SesionActual.getUsuarioLogueado().getIdUsuario() : 1;
+        boolean exito = observacionDAO.registrarObservacionPorCodigo(sel.getCodigoProyecto(), idUsr, "SECRETARIA", obs, "PENDIENTE");
+        if (exito) {
+            if (txtObservacionSecretaria != null) txtObservacionSecretaria.clear();
+            mostrarAlerta("Observación Registrada", "La observación fue agregada exitosamente al historial del proyecto " + sel.getCodigoProyecto() + ".");
+        } else {
+            mostrarAlerta("Error", "No se pudo registrar la observación en XAMPP MySQL.");
+        }
     }
 
     @FXML

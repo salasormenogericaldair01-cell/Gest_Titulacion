@@ -21,6 +21,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -60,10 +61,19 @@ public class JefeController implements Initializable {
     @FXML private VBox sidebar;
     @FXML private Button btnNavAprobacion;
     @FXML private Button btnNavUsuarios;
+    @FXML private Button btnNavTicketsTI;
     @FXML private Button btnNavCatalogos;
     @FXML private Button btnNavReportes;
     @FXML private Button btnNavPerfil;
     
+    @FXML private VBox panelTicketsTI;
+    @FXML private TableView<Observacion> tbTicketsTI;
+    @FXML private TableColumn<Observacion, String> colTicId;
+    @FXML private TableColumn<Observacion, String> colTicFecha;
+    @FXML private TableColumn<Observacion, String> colTicDesc;
+    @FXML private TableColumn<Observacion, String> colTicEstado;
+    
+    @FXML private TextArea txtObservacionJefatura;
     @FXML private VBox panelAprobacion;
     @FXML private TextField txtBuscarProy;
     @FXML private TableView<Proyecto> tbProyectosAprobacion;
@@ -181,6 +191,11 @@ public class JefeController implements Initializable {
         colUsuRol.setCellValueFactory(new PropertyValueFactory<>("rol"));
         colUsuPassClaro.setCellValueFactory(new PropertyValueFactory<>("passwordClaro"));
         colUsuEst.setCellValueFactory(new PropertyValueFactory<>("estado"));
+
+        if (colTicId != null) colTicId.setCellValueFactory(cellData -> new javafx.beans.property.ReadOnlyStringWrapper("TICK-" + cellData.getValue().getIdObservacion()));
+        if (colTicFecha != null) colTicFecha.setCellValueFactory(cellData -> new javafx.beans.property.ReadOnlyStringWrapper(cellData.getValue().getFechaObservacion() != null ? cellData.getValue().getFechaObservacion().toString() : "-"));
+        if (colTicDesc != null) colTicDesc.setCellValueFactory(cellData -> new javafx.beans.property.ReadOnlyStringWrapper(cellData.getValue().getDescripcion() != null ? cellData.getValue().getDescripcion() : "-"));
+        if (colTicEstado != null) colTicEstado.setCellValueFactory(cellData -> new javafx.beans.property.ReadOnlyStringWrapper(cellData.getValue().getEstadoObservacion() != null ? cellData.getValue().getEstadoObservacion() : "-"));
     }
 
     private void configuringMoreTableCells() {
@@ -216,6 +231,7 @@ public class JefeController implements Initializable {
         }
         if (cbTipoReporte != null) {
             cbTipoReporte.getItems().addAll(
+                "Todos los Proyectos",
                 "Proyectos Registrados y en Revisión",
                 "Proyectos Aprobados para Titulación",
                 "Proyectos Observados y Rechazados",
@@ -277,6 +293,41 @@ public class JefeController implements Initializable {
     }
 
     @FXML
+    private void mostrarPanelTicketsTI(ActionEvent event) {
+        ocultarTodosPaneles();
+        if (panelTicketsTI != null) {
+            panelTicketsTI.setVisible(true);
+            panelTicketsTI.setManaged(true);
+        }
+        actualizarEstilosNav(btnNavTicketsTI);
+        cargarTicketsTI();
+    }
+
+    private void cargarTicketsTI() {
+        if (tbTicketsTI != null) {
+            List<Observacion> tickets = observacionDAO.listarPorRol("TICKET_TI");
+            tbTicketsTI.setItems(FXCollections.observableArrayList(tickets));
+        }
+    }
+
+    @FXML
+    private void atenderTicketTI(ActionEvent event) {
+        if (tbTicketsTI == null) return;
+        Observacion sel = tbTicketsTI.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Por favor seleccione un ticket de la tabla para atenderlo o resolverlo.");
+            return;
+        }
+        boolean exito = observacionDAO.actualizarEstadoObservacion(sel.getIdObservacion(), "RESUELTO");
+        if (exito) {
+            cargarTicketsTI();
+            mostrarAlerta("Ticket Atendido / Resuelto", "El ticket TICK-" + sel.getIdObservacion() + " ha sido marcado como RESUELTO en la base de datos.");
+        } else {
+            mostrarAlerta("Error", "No se pudo actualizar el estado del ticket en XAMPP MySQL.");
+        }
+    }
+
+    @FXML
     private void mostrarPanelCatalogos(ActionEvent event) {
         ocultarTodosPaneles();
         panelCatalogos.setVisible(true);
@@ -324,6 +375,83 @@ public class JefeController implements Initializable {
     }
 
     @FXML
+    private void descargarDocumentoProyecto(ActionEvent event) {
+        Proyecto sel = tbProyectosAprobacion.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            mostrarAlerta("Selección requerida", "Seleccione un proyecto de la tabla para descargar y visualizar su documento oficial.");
+            return;
+        }
+        Proyecto bdProy = proyectoDAO.obtenerPorId(sel.getIdProyecto());
+        if (bdProy != null && bdProy.getArchivoData() != null && bdProy.getArchivoData().length > 0) {
+            sel.setArchivoNombre(bdProy.getArchivoNombre());
+            sel.setArchivoData(bdProy.getArchivoData());
+        }
+        if (sel.getArchivoData() == null || sel.getArchivoData().length == 0) {
+            mostrarAlerta("Sin Documento Adjunto", "El proyecto seleccionado (" + sel.getCodigoProyecto() + ") no tiene un documento o archivo subido por la Secretaría.");
+            return;
+        }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Descargar Documento del Proyecto (PDF y Word)");
+        fileChooser.getExtensionFilters().clear();
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Documento PDF (*.pdf)", "*.pdf"),
+            new FileChooser.ExtensionFilter("Documento Word (*.docx, *.doc)", "*.docx", "*.doc"),
+            new FileChooser.ExtensionFilter("Todos los archivos (*.*)", "*.*")
+        );
+        String nombreDef = sel.getArchivoNombre() != null && !sel.getArchivoNombre().isEmpty() ? sel.getArchivoNombre() : "Documento_" + sel.getCodigoProyecto() + ".pdf";
+        fileChooser.setInitialFileName(nombreDef);
+        Stage stage = (Stage) btnSidebarToggle.getScene().getWindow();
+        File archivo = fileChooser.showSaveDialog(stage);
+        if (archivo != null) {
+            try {
+                String rut = archivo.getAbsolutePath();
+                if (!rut.contains(".") && fileChooser.getSelectedExtensionFilter() != null && fileChooser.getSelectedExtensionFilter().getExtensions() != null && !fileChooser.getSelectedExtensionFilter().getExtensions().isEmpty()) {
+                    String ext = fileChooser.getSelectedExtensionFilter().getExtensions().get(0).replace("*", "");
+                    if (!ext.equals(".*")) {
+                        archivo = new File(rut + ext);
+                    }
+                }
+                java.nio.file.Files.write(archivo.toPath(), sel.getArchivoData());
+                boolean abierto = false;
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+                    try {
+                        Desktop.getDesktop().open(archivo);
+                        abierto = true;
+                    } catch (Exception ignored) {}
+                }
+                String extra = abierto ? "\n\nEl archivo se ha abierto en su aplicación predeterminada para revisión." : "\n\nPuede abrir el archivo directamente desde la carpeta donde lo guardó.";
+                mostrarAlerta("Descarga Exitosa", "El documento fue guardado correctamente en:\n" + archivo.getAbsolutePath() + extra);
+            } catch (Exception e) {
+                mostrarAlerta("Error al Guardar", "Ocurrió un error al guardar el documento en disco: " + e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void emitirObservacionJefe(ActionEvent event) {
+        Proyecto seleccionado = tbProyectosAprobacion.getSelectionModel().getSelectedItem();
+        if (seleccionado == null) {
+            mostrarAlerta("Selección requerida", "Por favor seleccione un proyecto de la tabla para emitir observaciones.");
+            return;
+        }
+        String obs = txtObservacionJefatura != null ? txtObservacionJefatura.getText().trim() : "";
+        if (obs.isEmpty()) {
+            mostrarAlerta("Texto Requerido", "Escriba el detalle de las correcciones u observaciones de Jefatura en el cuadro de texto.");
+            return;
+        }
+        int idUsr = SesionActual.haySesionActiva() ? SesionActual.getUsuarioLogueado().getIdUsuario() : 3;
+        boolean exito = observacionDAO.registrarObservacionPorCodigo(seleccionado.getCodigoProyecto(), idUsr, "JEFE_INVESTIGACION", obs, "PENDIENTE");
+        if (exito) {
+            proyectoDAO.cambiarEstado(seleccionado.getCodigoProyecto(), "OBSERVADO");
+            if (txtObservacionJefatura != null) txtObservacionJefatura.clear();
+            cargarDatosAprobacion();
+            mostrarAlerta("Observación Emitida", "La observación de Jefatura fue registrada exitosamente y el proyecto regresó al estado OBSERVADO para subsanación.");
+        } else {
+            mostrarAlerta("Error", "No se pudo guardar la observación en MySQL.");
+        }
+    }
+
+    @FXML
     private void aprobarProyectoFinal(ActionEvent event) {
         Proyecto seleccionado = tbProyectosAprobacion.getSelectionModel().getSelectedItem();
         if (seleccionado == null) {
@@ -345,8 +473,14 @@ public class JefeController implements Initializable {
             mostrarAlerta("Selección requerida", "Por favor seleccione un proyecto de la tabla para rechazarlo.");
             return;
         }
+        String obs = txtObservacionJefatura != null ? txtObservacionJefatura.getText().trim() : "";
+        int idUsr = SesionActual.haySesionActiva() ? SesionActual.getUsuarioLogueado().getIdUsuario() : 3;
+        if (!obs.isEmpty()) {
+            observacionDAO.registrarObservacionPorCodigo(seleccionado.getCodigoProyecto(), idUsr, "JEFE_INVESTIGACION", obs, "PENDIENTE");
+        }
         if (proyectoDAO.cambiarEstado(seleccionado.getCodigoProyecto(), "RECHAZADO")) {
-            mostrarAlerta("Proyecto Rechazado", "El proyecto " + seleccionado.getCodigoProyecto() + " ha sido devuelto y rechazado.");
+            if (txtObservacionJefatura != null) txtObservacionJefatura.clear();
+            mostrarAlerta("Proyecto Devuelto / Rechazado", "El proyecto " + seleccionado.getCodigoProyecto() + " ha sido devuelto" + (!obs.isEmpty() ? " con sus observaciones registradas." : "."));
             cargarDatosAprobacion();
         } else {
             mostrarAlerta("Error", "No se pudo actualizar el estado en la base de datos MySQL.");
@@ -379,11 +513,17 @@ public class JefeController implements Initializable {
     @FXML
     private void generarTicketSoporteTI(ActionEvent event) {
         String ticket = "TICK-SUIZA-TI-" + (System.currentTimeMillis() % 10000);
+        int idUsr = SesionActual.getUsuarioLogueado() != null ? SesionActual.getUsuarioLogueado().getIdUsuario() : 3;
+        String desc = "REQUERIMIENTO SOPORTE TI (Admin/Jefatura) - Cód: " + ticket;
+        boolean exito = observacionDAO.registrarTicketTI(idUsr, desc);
+        if (exito && panelTicketsTI != null && panelTicketsTI.isVisible()) {
+            cargarTicketsTI();
+        }
         mostrarAlerta("Ticket TI Generado Oficialmente", 
-            "Se ha generado el requerimiento para Soporte TI Institucional.\n\n" +
+            "Se ha registrado el requerimiento en la base de datos MySQL (tabla observaciones).\n\n" +
             "Código de Ticket: " + ticket + "\n" +
             "Área: Jefatura e Investigación / Soporte TI\n" +
-            "Estado: PENDIENTE DE ATENCIÓN");
+            "Estado: PENDIENTE (Visible en Bandeja de Tickets TI)");
     }
 
     @FXML
@@ -536,20 +676,22 @@ public class JefeController implements Initializable {
         List<Proyecto> resultados = proyectoDAO.listarPorRangoTiempo(desde.toString(), hoy.toString());
         
         String tipoRep = cbTipoReporte != null && cbTipoReporte.getValue() != null ? cbTipoReporte.getValue() : "";
-        if (!tipoRep.isEmpty() && !"Todos los Proyectos".equals(tipoRep) && !"Consolidado por Programa de Estudio".equals(tipoRep)) {
-            List<Proyecto> filtradosPorTipo = new ArrayList<>();
-            for (Proyecto p : resultados) {
-                if (tipoRep.contains("Aprobados") && p.getEstado().contains("APROBADO")) {
-                    filtradosPorTipo.add(p);
-                } else if (tipoRep.contains("Observados") && (p.getEstado().contains("OBSERVADO") || p.getEstado().contains("RECHAZADO"))) {
-                    filtradosPorTipo.add(p);
-                } else if (tipoRep.contains("Revisión") && p.getEstado().contains("REVISION")) {
-                    filtradosPorTipo.add(p);
-                } else {
-                    filtradosPorTipo.add(p);
+        if (!tipoRep.isEmpty() && !"Todos los Proyectos".equals(tipoRep)) {
+            if ("Consolidado por Programa de Estudio".equals(tipoRep)) {
+                resultados.sort(java.util.Comparator.comparing(p -> p.getProgramaEstudio() != null ? p.getProgramaEstudio() : ""));
+            } else {
+                List<Proyecto> filtradosPorTipo = new ArrayList<>();
+                for (Proyecto p : resultados) {
+                    if (tipoRep.contains("Aprobados") && (p.getEstado().contains("APROBADO") || "APROBADO_COORDINACION".equals(p.getEstado()))) {
+                        filtradosPorTipo.add(p);
+                    } else if (tipoRep.contains("Observados") && (p.getEstado().contains("OBSERVADO") || p.getEstado().contains("RECHAZADO"))) {
+                        filtradosPorTipo.add(p);
+                    } else if (tipoRep.contains("Revisión") && (p.getEstado().contains("REVISION") || p.getEstado().contains("REGISTRADO"))) {
+                        filtradosPorTipo.add(p);
+                    }
                 }
+                resultados = filtradosPorTipo;
             }
-            resultados = filtradosPorTipo;
         }
         if (tbReportes != null) {
             tbReportes.setItems(FXCollections.observableArrayList(resultados));
@@ -694,6 +836,10 @@ public class JefeController implements Initializable {
         panelAprobacion.setManaged(false);
         panelUsuarios.setVisible(false);
         panelUsuarios.setManaged(false);
+        if (panelTicketsTI != null) {
+            panelTicketsTI.setVisible(false);
+            panelTicketsTI.setManaged(false);
+        }
         panelCatalogos.setVisible(false);
         panelCatalogos.setManaged(false);
         panelReportes.setVisible(false);
@@ -703,6 +849,7 @@ public class JefeController implements Initializable {
     private void actualizarEstilosNav(Button btnActivo) {
         btnNavAprobacion.getStyleClass().remove("sidebar-btn-active");
         btnNavUsuarios.getStyleClass().remove("sidebar-btn-active");
+        if (btnNavTicketsTI != null) btnNavTicketsTI.getStyleClass().remove("sidebar-btn-active");
         btnNavCatalogos.getStyleClass().remove("sidebar-btn-active");
         btnNavReportes.getStyleClass().remove("sidebar-btn-active");
         if (btnActivo != null) {

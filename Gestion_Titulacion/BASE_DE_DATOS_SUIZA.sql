@@ -139,6 +139,8 @@ CREATE TABLE `proyectos` (
   `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `resumen` text DEFAULT NULL,
   `id_usuario_registro` int(11) DEFAULT NULL,
+  `archivo_nombre` varchar(255) DEFAULT NULL,
+  `archivo_data` longblob DEFAULT NULL,
   PRIMARY KEY (`id_proyecto`),
   UNIQUE KEY `codigo_proyecto` (`codigo_proyecto`),
   KEY `idx_codigo` (`codigo_proyecto`),
@@ -156,7 +158,7 @@ CREATE TABLE `proyectos` (
 
 LOCK TABLES `proyectos` WRITE;
 /*!40000 ALTER TABLE `proyectos` DISABLE KEYS */;
-INSERT INTO `proyectos` VALUES (1,'PROY-SUIZA-2026-001','Sistema Inteligente de Gestión Hospitalaria y Control de Triage MediConnect en IESTP Suiza','DESARROLLO DE SISTEMAS DE INFORMACIÓN','Tesis o Proyecto de Aplicación Profesional','Ing. Ruber Torres Arevalo','EN_REVISION','2026-06-23','2026-07-08 18:07:04','Desarrollo de un sistema de control hospitalario con arquitectura All-in-One y JavaFX.',1),(2,'PROY-SUIZA-2026-042','Plataforma Web para el Control de Almacén e Inventarios con Código de Barras en Pucallpa','DESARROLLO DE SISTEMAS DE INFORMACIÓN','Examen de Suficiencia Profesional','Lic. Carlos Mendoza','APROBADO_COORDINACION','2026-04-08','2026-07-08 18:07:04','Implementaci?n de sistema web para reducir p?rdidas en el almac?n central de la instituci?n.',1),(3,'PROY-SUIZA-2025-018','Evaluación de los Procesos Contables y Auditoría Digital en Mypes de la Región Ucayali','CONTABILIDAD','Tesis o Proyecto de Aplicaci?n Profesional','Dra. Mar?a Gonzales','OBSERVADO','2025-05-08','2026-07-08 18:07:04','Investigaci?n de impacto tributario y digitalizaci?n contable en empresas locales.',1),(4,'PROY-SUIZA-2023-005','Sistema Móvil para el Segregado de Residuos Hospitalarios y Protocolos de Bioseguridad','ENFERMERÍA TÉCNICA','Examen de Suficiencia Profesional','Ing. Ruber Torres Arevalo','APROBADO_FINAL','2022-07-08','2026-07-08 18:07:04','App m?vil para control de protocolos de bioseguridad en centros de salud.',1);
+INSERT INTO `proyectos` VALUES (1,'PROY-SUIZA-2026-001','Sistema Inteligente de Gestión Hospitalaria y Control de Triage MediConnect en IESTP Suiza','DESARROLLO DE SISTEMAS DE INFORMACIÓN','Tesis o Proyecto de Aplicación Profesional','Ing. Ruber Torres Arevalo','EN_REVISION','2026-06-23','2026-07-08 18:07:04','Desarrollo de un sistema de control hospitalario con arquitectura All-in-One y JavaFX.',1,NULL,NULL),(2,'PROY-SUIZA-2026-042','Plataforma Web para el Control de Almacén e Inventarios con Código de Barras en Pucallpa','DESARROLLO DE SISTEMAS DE INFORMACIÓN','Examen de Suficiencia Profesional','Lic. Carlos Mendoza','APROBADO_COORDINACION','2026-04-08','2026-07-08 18:07:04','Implementaci?n de sistema web para reducir p?rdidas en el almac?n central de la instituci?n.',1,NULL,NULL),(3,'PROY-SUIZA-2025-018','Evaluación de los Procesos Contables y Auditoría Digital en Mypes de la Región Ucayali','CONTABILIDAD','Tesis o Proyecto de Aplicaci?n Profesional','Dra. Mar?a Gonzales','OBSERVADO','2025-05-08','2026-07-08 18:07:04','Investigaci?n de impacto tributario y digitalizaci?n contable en empresas locales.',1,NULL,NULL),(4,'PROY-SUIZA-2023-005','Sistema Móvil para el Segregado de Residuos Hospitalarios y Protocolos de Bioseguridad','ENFERMERÍA TÉCNICA','Examen de Suficiencia Profesional','Ing. Ruber Torres Arevalo','APROBADO_FINAL','2022-07-08','2026-07-08 18:07:04','App m?vil para control de protocolos de bioseguridad en centros de salud.',1,NULL,NULL);
 /*!40000 ALTER TABLE `proyectos` ENABLE KEYS */;
 UNLOCK TABLES;
 

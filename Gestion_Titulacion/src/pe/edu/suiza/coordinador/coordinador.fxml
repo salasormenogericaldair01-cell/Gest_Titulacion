@@ -80,8 +80,9 @@
                         </TableView>
                         <HBox alignment="CENTER_RIGHT" spacing="10.0">
                            <children>
+                              <Button mnemonicParsing="false" onAction="#descargarDocumentoProyecto" styleClass="btn-primary" text="Descargar Documento (Secretaría)" />
                               <Button mnemonicParsing="false" onAction="#descargarObservacionesExcel" styleClass="btn-secondary" text="Descargar Obs. Excel (.XLS)" />
-                              <Button mnemonicParsing="false" onAction="#descargarObservacionesPDF" styleClass="btn-primary" text="Descargar Obs. PDF/HTML" />
+                              <Button mnemonicParsing="false" onAction="#descargarObservacionesPDF" styleClass="btn-secondary" text="Descargar Obs. PDF/HTML" />
                               <Button mnemonicParsing="false" onAction="#exportarProyectosExcel" styleClass="btn-secondary" text="Exportar Proyectos (.XLS)" />
                            </children>
                         </HBox>

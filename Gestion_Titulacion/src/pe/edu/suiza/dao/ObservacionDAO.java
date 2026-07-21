@@ -55,6 +55,48 @@ public class ObservacionDAO {
         return false;
     }
 
+    public boolean registrarTicketTI(int idUsuario, String descripcion) {
+        String sqlInsert = "INSERT INTO observaciones (id_proyecto, id_usuario, rol_autor, descripcion, estado_observacion) VALUES (NULL, ?, 'TICKET_TI', ?, 'PENDIENTE')";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return false;
+            pstmt = conn.prepareStatement(sqlInsert);
+            if (idUsuario > 0) {
+                pstmt.setInt(1, idUsuario);
+            } else {
+                pstmt.setNull(1, java.sql.Types.INTEGER);
+            }
+            pstmt.setString(2, descripcion);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[ObservacionDAO] Error en registrarTicketTI: " + e.getMessage());
+            return false;
+        } finally {
+            cerrarRecursos(pstmt, null);
+        }
+    }
+
+    public boolean actualizarEstadoObservacion(int idObservacion, String nuevoEstado) {
+        String sql = "UPDATE observaciones SET estado_observacion = ? WHERE id_observacion = ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = ConexionDB.getInstancia().getConexion();
+            if (conn == null) return false;
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, nuevoEstado);
+            pstmt.setInt(2, idObservacion);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[ObservacionDAO] Error en actualizarEstadoObservacion: " + e.getMessage());
+            return false;
+        } finally {
+            cerrarRecursos(pstmt, null);
+        }
+    }
+
     public List<Observacion> listarPorRol(String rolAutor) {
         List<Observacion> lista = new ArrayList<>();
         String sql = "SELECT o.*, p.codigo_proyecto, p.titulo "
